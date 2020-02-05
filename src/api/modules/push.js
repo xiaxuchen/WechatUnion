@@ -8,9 +8,7 @@ export default {
     })
   },
   getTagList () {
-    return http.get('/push/tagList', {
-      token: ''
-    })
+    return http.get('/push/tagList')
   },
   /**
    * 通过用户标签获取用户列表
@@ -30,8 +28,6 @@ export default {
    * 获取素材列表
    */
   getMaterialList () {
-    return http.get('/push/materials', {
-      token: ''
-    })
+    return http.get('/push/materials')
   }
 }

@@ -8,7 +8,7 @@ export default {
    * @returns {*}
    */
   login (username, password) {
-    return http.post('/manager/login', {
+    return http.post('/sysuser/login', {
       username,
       password
     })
@@ -18,8 +18,19 @@ export default {
    * @param url 页面路径
    */
   verifyPermit (path) {
-    return http.get('/manager/permission', {
+    return http.get('/sysuser/permission', {
       path
+    })
+  },
+  /**
+   * 分页获取系统用户列表
+   * @param curPage 当前页
+   * @param pageSize 每页大小
+   */
+  getSysUserList (curPage, pageSize) {
+    return http.get('/sysuser/list', {
+      curPage,
+      pageSize
     })
   }
 }

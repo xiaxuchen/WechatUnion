@@ -1,10 +1,10 @@
 <template>
     <div class="select-receiver">
-      <el-row>
-        <el-col align="right">
+      <div>
+        <el-col align="right" :span="23">
           <el-button type="primary" @click="nextStep">下一步 <b class="el-icon-right"></b></el-button>
         </el-col>
-      </el-row>
+      </div>
       <div class="searcher">
         <el-form :inline="true">
           <el-form-item label="用户标签">
@@ -48,7 +48,7 @@ import SelectedUserList from './components/SelectedUserList'
 import {mapState} from 'vuex'
 export default {
   mounted () {
-    this.api.getTagList().then(
+    this.api.push.getTagList().then(
       this.api.commonResp((success, data) => {
         if (success) {
           data.forEach((item) => {

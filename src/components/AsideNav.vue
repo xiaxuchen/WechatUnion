@@ -15,10 +15,16 @@
       :router="true"
       :collapse="isCollapse"
       active-text-color="#ffd04b">
-      <el-menu-item :index="nav.path" v-for="nav in navList" :key="nav.title">
-        <i :class="nav.iconClass"></i>
-        <span slot="title">{{nav.title}}</span>
-      </el-menu-item>
+        <div :is="nav.subMenus? 'el-submenu': 'el-menu-item'" :index="nav.path" v-for="nav in navList" :key="nav.title">
+          <template slot="title" v-if="nav.subMenus">
+            <i :class="nav.iconClass"></i><span slot="title">{{ nav.title }}</span>
+          </template>
+          <el-menu-item v-for="menu in nav.subMenus" :key="menu.path" :index="menu.path" v-if="nav.subMenus">
+            {{ menu.title }}
+          </el-menu-item>
+          <i :class="nav.iconClass" v-if="!nav.subMenus"></i>
+          <span slot="title" v-if="!nav.subMenus">{{nav.title}}</span>
+        </div>
     </el-menu>
   </div>
 </template>
@@ -78,7 +84,13 @@ export default {
       cursor: pointer;
     }
   }
-  .menu-padding {
-    padding-left: 20px
+
+  .aside-nav {
+    &::-webkit-scrollbar{
+      width: 0;
+    }
+    &> ul {
+      height:100%;
+    }
   }
 </style>

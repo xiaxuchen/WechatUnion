@@ -76,7 +76,7 @@ export default {
         background: 'rgba(0, 0, 0, 0.7)'
       })
 
-      this.api.sendPush(users, {
+      this.api.push.sendPush(users, {
         type,
         content
       }).then(this.api.commonResp((success, data) => {

@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
     spinner: 'el-icon-loading',
     background: 'rgba(0, 0, 0, 0.7)'
   })
-  api.verifyPermit(to.path)
+  api.sysuser.verifyPermit(to.path)
     .then(api.commonResp((success) => {
       if (success) {
         next()

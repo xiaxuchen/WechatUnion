@@ -126,7 +126,7 @@ export default {
      */
     getUserList () {
       this.loading = true
-      this.api.getUserList(this.tagSelected,
+      this.api.push.getUserList(this.tagSelected,
         this.userData.curPage,
         this.userData.pageSize)
         .then(this.api.commonResp((success, data) => {

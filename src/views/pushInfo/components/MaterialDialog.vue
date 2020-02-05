@@ -41,7 +41,7 @@ export default {
      */
     loadMaterialList () {
       this.loading = true
-      this.api.getMaterialList().then(this.api.commonResp((success, data) => {
+      this.api.push.getMaterialList().then(this.api.commonResp((success, data) => {
         if (success) {
           this.materialList = data
           console.log(JSON.stringify(data))

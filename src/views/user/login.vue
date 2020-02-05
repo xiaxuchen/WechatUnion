@@ -74,7 +74,7 @@ export default {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
           this.logining = true
-          api.login(vm.ruleForm.username, vm.ruleForm.password)
+          api.sysuser.login(vm.ruleForm.username, vm.ruleForm.password)
             .then(api.commonResp((success, data, response) => {
               if (success) {
                 vm.$notify({

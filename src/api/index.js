@@ -1,13 +1,13 @@
 import http from './axios'
 import push from './modules/push'
-import manager from './modules/manager'
+import sysuser from './modules/sysuser'
 
 const baseURL = http.baseURL
 
 export default {
   baseURL,
-  ...push,
-  ...manager,
+  push,
+  sysuser,
   commonResp (fn) {
     return function (resp) {
       let data = resp.data

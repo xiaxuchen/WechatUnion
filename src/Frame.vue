@@ -1,32 +1,24 @@
 <template>
   <el-container direction="vertical">
     <el-row>
-      <router-view name="nav" />
-      <!--<el-container class="full-width" style="height: 60px" direction="horizontal">-->
-        <!--<el-row class="full-width shadow-base container-border">-->
-          <!--<div class="left" style="width: 200px">-->
-            <!--<a href="#" style="vertical-align: middle;background-color: white;width: 200px;height: 60px;line-height: 60px" >-->
-            <!--</a>-->
-          <!--</div>-->
-          <!--<div class="right container-border box-border" style="padding: 0 300px 0 200px;">-->
-          <!--</div>-->
-          <!--<div class="addition">-->
-          <!--</div>-->
-        <!--</el-row>-->
-      <!--</el-container>-->
+        <v-header />
     </el-row>
-    <div class="content-wrap">
-      <aside-nav  class="fl" v-model="asideWidth" :nav-list="navList"></aside-nav>
-      <div class="content box-border" :style="{marginLeft:asideWidth + 'px',paddingRight:asideWidth + 'px'}" >
-        <router-view name="content"/>
+    <el-row class="content" >
+      <aside-nav id="aside" class="fl left" v-model="asideWidth" :nav-list="navList" />
+      <div :style="{marginLeft:asideWidth + 'px'}">
+        <v-tags />
+        <el-scrollbar class="hidden-horizontal" :style="{height:scrollHeight + 'px'}">
+          <router-view name="content" />
+        </el-scrollbar>
       </div>
-    </div>
+    </el-row>
   </el-container>
 </template>
 
 <script>
-import AsideNav from './components/AsideNav'
-
+import AsideNav from '@/components/AsideNav'
+import VHeader from '@/components/Header'
+import VTags from '@/components/Tags'
 export default {
   name: 'home',
   data () {
@@ -53,9 +45,14 @@ export default {
           path: '/manager'
         },
         {
-          title: '我的信息',
-          iconClass: 'fa fa-user',
-          path: '/mine'
+          title: '系统管理',
+          iconClass: 'el-icon-setting',
+          subMenus: [
+            {
+              path: '/sysuser',
+              title: '用户管理'
+            }
+          ]
         }
       ],
       asideWidth: 200,
@@ -68,8 +65,15 @@ export default {
       }
     }
   },
+  computed: {
+    scrollHeight () {
+      return (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
+    }
+  },
   components: {
-    AsideNav
+    AsideNav,
+    VHeader,
+    VTags
   },
   methods: {
     handleOperate (event) {
@@ -84,34 +88,6 @@ export default {
   @import url(./assets/stylesheet/common);
   #aside{
     background-color: #545c64;
-  }
-
-  .content-wrap{
-    position: relative;
-    width: 100%;
     height: 100%;
-    .aside-nav{
-      height: 100%;
-    }
-    .content{
-      width: 100%;
-      height: 100%;
-      position: absolute;
-    }
   }
-
-  .addition{
-    width: 300px;
-    font-size: 20px;
-    line-height: 60px;
-    float: right;
-    text-align: center;
-    position: relative;
-    z-index: 100;
-  }
-  .addition:hover{
-    color: @brand;
-    cursor: pointer;
-  }
-
 </style>
