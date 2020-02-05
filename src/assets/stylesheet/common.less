@@ -1,0 +1,270 @@
+/**
+  颜色
+ */
+@brand:#409EFF;
+@success:#67C23A;
+@warning:#E6A23C;
+@danger:#F56C6C;
+@info:#909399;
+@normal:#000000;
+@white:#ffffff;
+
+/**
+字体大小
+ */
+@font-lg:20px;
+@font-md:16px;
+@font-sm:14px;
+
+
+/**
+文本颜色
+ */
+.text-brand{
+  color: @brand!important;
+}
+
+.text-success{
+  color: @success!important;
+}
+
+.text-warning{
+  color: @warning!important;
+}
+
+.text-danger{
+  color: @danger!important;
+}
+
+.text-info{
+  color: @info!important;
+}
+
+.text-color-normal{
+  color: @normal!important;
+}
+
+.text-color-white {
+  color: @white!important;
+}
+
+/**
+背景色
+ */
+.brand{
+  background-color: @brand!important;
+}
+
+.success{
+  background-color: @success!important;
+}
+
+.warning{
+  background-color: @warning!important;
+}
+
+.danger{
+  background-color: @danger!important;
+}
+
+.info{
+  background-color: @info!important;
+}
+
+.transparent{
+  background-color: transparent!important;
+}
+
+.white {
+  background-color: @white!important;
+}
+
+/**
+通用字体大小
+ */
+
+.font-lg{
+  font-size: @font-lg!important;
+}
+
+.font-md{
+  font-size: @font-md!important;
+}
+
+.font-sm{
+  font-size: @font-sm!important;
+}
+
+/**
+文本排列
+ */
+.text-left{
+  text-align: left!important;
+}
+
+.text-center{
+  text-align: center!important;
+}
+
+.text-right{
+  text-align: right!important;
+}
+
+/**
+文本样式
+ */
+
+.text-weight-normal{
+  font-weight: normal!important;
+}
+
+.text-bold{
+  font-weight: bold!important;
+}
+
+.text-bolder{
+  font-weight: bolder!important;
+}
+
+.text-italic{
+  font-style: italic!important;
+}
+
+
+/**
+充满父容器宽高
+ */
+.full-height{
+  height: 100%;
+}
+
+.full-width{
+  width: 100%;
+}
+
+.full{
+  width: 100%;
+  height: 100%;
+}
+
+/**
+浅色投影
+ */
+.shadow-tint{
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}
+
+.shadow-base{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+}
+
+
+/**
+居中
+ */
+.center-vertical{
+  margin: 0 auto;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.center-h{
+  margin: 0 auto;
+}
+
+/**
+浮动
+ */
+.fl{
+  float:left;
+}
+
+.fr{
+  float: right;
+}
+
+/**
+字体图标
+ */
+
+.el-menu-item [class^="fa"] {
+  margin-right: 5px;
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+/**
+左右布局，左边固定大小，右边随容器大小变化
+ */
+.container-border {
+  position: relative;
+  overflow: hidden;
+  .left{
+    float: left;
+    height: 100%;
+  }
+  .right{
+    position: absolute;
+    float: left;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/**
+box-sizing
+ */
+.box-border{
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+}
+
+.clearfix:after,.clearfix:before{
+  display: table-cell;
+  content: '';
+  clear: both;
+}
+
+.clearfix{
+  zoom: 1;
+}
+
+
+/**
+padding
+ */
+.padding-sm{
+  padding: 5px 10px;
+}
+
+.padding-sm-h{
+  padding: 0px 10px;
+}
+
+.padding-sm-v{
+  padding: 5px 0px;
+}
+
+.border-radius-sm {
+  border-radius: 2px
+}
+
+.border-radius-md {
+  border-radius: 4px
+}
+
+.border-radius-lg {
+  border-radius: 30px
+}
+
+.border-radius-circle {
+  border-radius: 50%;
+}
+
+.center-block {
+  margin: 0 auto;
+}
