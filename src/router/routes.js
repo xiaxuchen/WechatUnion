@@ -17,7 +17,7 @@ export default [
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/user/login')
+    component: () => import('@/views/user/login')
   },
   {
     path: '/',
@@ -25,32 +25,39 @@ export default [
     component: Frame,
     children: [
       {
-        path: 'hello',
-        name: 'hello',
-        components: {
-          content: () =>
-            import('../views/selectReceiver')
+        path: 'index',
+        name: 'index',
+        component: () => import('@/views/agent/index'),
+        meta: {
+          title: '系统首页',
+          index: '/index'
         }
       },
       {
         path: 'select',
         name: 'selectReceiver',
-        components: {
-          content: () => import('../views/selectReceiver')
+        component: () => import('@/views/agent/selectReceiver'),
+        meta: {
+          title: '用户推送',
+          index: '/select'
         }
       },
       {
         path: 'pushInfo',
         name: 'pushInfo',
-        components: {
-          content: () => import('../views/pushInfo')
+        component: () => import('@/views/agent/pushInfo'),
+        meta: {
+          title: '用户推送',
+          index: '/select'
         }
       },
       {
         path: 'sysUser',
         name: 'sysUser',
-        components: {
-          content: () => import('@/views/admin/sysUser')
+        component: () => import('@/views/admin/sysUser'),
+        meta: {
+          title: '用户管理',
+          index: '/sysUser'
         }
       }
     ]

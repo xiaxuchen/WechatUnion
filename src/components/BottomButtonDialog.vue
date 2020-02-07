@@ -8,7 +8,7 @@
         <div slot="footer" class="dialog-footer" align="right" v-if="bottomVisible">
           <div>
             <el-button @click="hide">取 消</el-button>
-            <el-button type="primary" @click="confirm">确 定</el-button>
+            <el-button type="primary" @click="confirm">{{confirmButton}}</el-button>
           </div>
         </div>
       </el-dialog>
@@ -27,15 +27,16 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    confirmButton: {
+      type: String,
+      required: false,
+      default: '确 定'
     }
-  },
-  model: {
-    prop: 'visible',
-    event: 'change'
   },
   methods: {
     hide () {
-      this.$emit('change', false)
+      this.$emit('update:visible', false)
     },
     confirm () {
       this.$emit('on-confirm')

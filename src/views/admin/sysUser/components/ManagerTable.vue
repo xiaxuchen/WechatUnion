@@ -8,17 +8,10 @@
         v-loading="listLoading"
         @selection-change="selectChange">
         <el-table-column type="selection" width="55" />
+        <el-table-column prop="id" label="编号" />
         <el-table-column prop="username" label="用户名">
           <template slot-scope="scope">
-            <el-button @click="handleSelect(scope.$index,scope.row)" type="text" size="small">{{scope.row.username}}</el-button>
-          </template>
-        </el-table-column>
-        <el-table-column prop="id" label="编码" />
-        <el-table-column prop="roles" label="角色" >
-          <template slot-scope="{row}">
-            <el-tag v-for="item in row.roles" :key="item.id" style="margin: 5px;">
-              {{item.name}}
-            </el-tag>
+            <el-button type="text" size="small">{{scope.row.username}}</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="sex" label="性别" :formatter="formatSex" sortable />
@@ -33,16 +26,24 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" @click="handleEdit(scope.$index,scope.row)">编辑</el-button>
-            <el-button type="danger" plain size="small" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
+            <el-button type="primary" plain size="small" @click="handleRole(scope.$index,scope.row)">角色</el-button>
+            <el-button size="small" @click="handleEdit(scope.$index,scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
+    <edit-sys-user-dialog @save-user="onSaveUser" />
+    <show-role-dialog />
   </div>
 </template>
 
 <script>
+import EditSysUserDialog from './EditSysUserDialog'
+import ShowRoleDialog from './ShowRoleDialog'
 export default {
+  components: {
+    EditSysUserDialog,
+    ShowRoleDialog
+  },
   props: {
     sysuserList: {
       type: Array,
@@ -69,19 +70,16 @@ export default {
      * 单个记录编辑事件
      */
     handleEdit (index, row) {
-
+      this.$bus.$emit('change-edit-sys-dialog', true, row)
     },
     /**
-     * 单个记录删除事件
+     * 显示角色
      */
-    handleDelete (index, row) {
-      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$emit('delete-manager', row.id)
-      })
+    handleRole (index, row) {
+      this.$bus.$emit('change-role-dialog', true, row)
+    },
+    onSaveUser (user) {
+      this.$emit('update-user', user)
     }
   }
 }

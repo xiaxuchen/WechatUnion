@@ -54,6 +54,11 @@ export default {
     prop: 'width',
     event: 'collapse'
   },
+  watch: {
+    $route (to, from) {
+      this.activeIndex = to.meta.index
+    }
+  },
   methods: {
     handleOpen (key, keyPath) {
       console.log(key, keyPath)

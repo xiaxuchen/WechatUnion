@@ -6,12 +6,19 @@
     <el-row class="content" >
       <aside-nav id="aside" class="fl left" v-model="asideWidth" :nav-list="navList" />
       <div :style="{marginLeft:asideWidth + 'px'}">
-        <v-tags />
+        <el-card :body-style="{padding: 0}">
+          <v-tags />
+        </el-card>
         <el-scrollbar class="hidden-horizontal" :style="{height:scrollHeight + 'px'}">
-          <router-view name="content" />
+          <transition name="move" mode="out-in">
+            <keep-alive>
+              <router-view />
+            </keep-alive>
+          </transition>
         </el-scrollbar>
       </div>
     </el-row>
+    <loading-dialog />
   </el-container>
 </template>
 
@@ -19,15 +26,21 @@
 import AsideNav from '@/components/AsideNav'
 import VHeader from '@/components/Header'
 import VTags from '@/components/Tags'
+import LoadingDialog from '@/components/LoadingDialog'
 export default {
-  name: 'home',
+  mounted () {
+    this.scrollHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
+    window.onresize = () => {
+      this.scrollHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
+    }
+  },
   data () {
     return {
       navList: [
         {
           title: '系统首页',
           iconClass: 'el-icon-s-home',
-          path: '/home'
+          path: '/index'
         },
         {
           title: '用户接线',
@@ -40,22 +53,19 @@ export default {
           path: '/select'
         },
         {
-          title: '人员管理',
-          iconClass: 'fa fa-users',
-          path: '/manager'
-        },
-        {
           title: '系统管理',
           iconClass: 'el-icon-setting',
+          path: '/system',
           subMenus: [
             {
-              path: '/sysuser',
+              path: '/sysUser',
               title: '用户管理'
             }
           ]
         }
       ],
       asideWidth: 200,
+      scrollHeight: 0,
       /**
          * 操作的事件
          */
@@ -65,15 +75,11 @@ export default {
       }
     }
   },
-  computed: {
-    scrollHeight () {
-      return (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
-    }
-  },
   components: {
     AsideNav,
     VHeader,
-    VTags
+    VTags,
+    LoadingDialog
   },
   methods: {
     handleOperate (event) {

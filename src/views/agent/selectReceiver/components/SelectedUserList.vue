@@ -67,7 +67,7 @@
       <!--  @size-change="handleSizeChange"
       @current-change="handleCurrentChange"-->
     </el-pagination>
-    <bottom-button-dialog v-model="uploadDialogVisible" :bottom-visible="false">
+    <bottom-button-dialog :visible.sync="uploadDialogVisible" :bottom-visible="false">
       <template slot="title">
         <h2>excel导入</h2>
       </template>

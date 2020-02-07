@@ -23,14 +23,43 @@ export default {
     })
   },
   /**
-   * 分页获取系统用户列表
+   * 分页获取系统用户列表,TODO 后缀路径需要删除
    * @param curPage 当前页
    * @param pageSize 每页大小
    */
-  getSysUserList (curPage, pageSize) {
-    return http.get('/sysuser/list', {
-      curPage,
-      pageSize
+  getSysUserList (query) {
+    return http.get('/sysusers/list', {
+      query: JSON.stringify(query)
+    })
+  },
+  /**
+   * 删除系统用户 TODO 后缀路径需要删除
+   * @param ids 要删除的用户的id
+   * @returns {*}
+   */
+  deleteSysusers (ids) {
+    return http.del('/sysusers/delete', {
+      ids
+    })
+  },
+  /**
+   * 获取系统中的角色列表 TODO 后缀路径需要删除
+   */
+  getSysRoles () {
+    return http.get('/roles/list')
+  },
+  /**
+   * 添加系统用户 TODO 需要把后缀去掉
+   * @param user 系统用户信息
+   */
+  addSysuser (user) {
+    return http.post('/sysuser/add', {
+      user
+    })
+  },
+  updateUser (user) {
+    return http.put('/sysuser/update', {}, {
+      data: JSON.stringify(user)
     })
   }
 }

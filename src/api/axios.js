@@ -3,11 +3,7 @@ import qs from 'qs'
 const baseURL = 'http://rest.apizza.net/mock/4b3bc197a2d00928b7e3a9f0a4932342'
 
 let http = axios.create({
-  baseURL: baseURL,
-  crossDomain: true,
-  headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
-  }
+  baseURL: baseURL
 })
 
 // 请求发前拦截，header中添加token
@@ -25,40 +21,39 @@ const get = function (apiPath, params) {
     paramsSerializer: params => {
       return qs.stringify(params, { indices: false })
     } })
-  // thenResponse(req, successCallback, errorCallback)
 }
 const post = function (apiPath, params, config) {
   handleNullParam(params)
   return http.post(apiPath, qs.stringify(params, { indices: false }), config)
-  // thenResponse(req, successCallback, errorCallback)
 }
 
 const put = function (apiPath, params, config) {
   handleNullParam(params)
   return http.put(apiPath, qs.stringify(params, { indices: false }, config))
-  // thenResponse(req, successCallback, errorCallback)
+  // return http.put(apiPath, null, {
+  //   data: qs.stringify(params, { indices: false})
+  // })
 }
 
-const del = function (apiPath, params, successCallback, errorCallback) {
+const del = function (apiPath, params) {
   handleNullParam(params)
   return http.delete(apiPath, {
     params: params,
     paramsSerializer: params => {
       return qs.stringify(params, { indices: false })
     } })
-  // thenResponse(req, successCallback, errorCallback)
 }
 
 function handleNullParam (params) {
-  if (typeof params === 'object') {
-    Object.keys(params).forEach(key => {
-      if (params[key] == null) {
-        params[key] = ''
-      } else if (typeof params[key] === 'object') {
-        handleNullParam(params[key])
-      }
-    })
-  }
+  // if (typeof params === 'object') {
+  //   Object.keys(params).forEach(key => {
+  //     if (params[key] == null) {
+  //       params[key] = ''
+  //     } else if (typeof params[key] === 'object') {
+  //       handleNullParam(params[key])
+  //     }
+  //   })
+  // }
 }
 
 /**

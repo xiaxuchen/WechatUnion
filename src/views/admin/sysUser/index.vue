@@ -10,21 +10,25 @@
       :list-loading="listLoading"
       @delete-manager="deleteManagers([$event])"
       @select-change="onManagerSelectChange"
+      @update-user="onUpdateUser"
     />
     <!-- 分页 -->
     <div style="margin-top: 20px">
       <el-pagination
-        @current-change="pageChange"
+        @size-change = "onSizeChange"
+        @current-change="onPageChange"
         :current-page="currentPage"
         :page-size="pageSize"
         layout="sizes, prev, pager, next, jumper, total"
         :total="total" />
     </div>
+    <add-sys-user-dialog @add-user="onAddUser"/>
   </div>
 </template>
 <script>
 import SearchBar from './components/SearchBar'
 import ManagerTable from './components/ManagerTable'
+import AddSysUserDialog from './components/AddSysUserDialog'
 export default {
   mounted () {
     // 初始加载用户信息
@@ -32,7 +36,8 @@ export default {
   },
   components: {
     SearchBar,
-    ManagerTable
+    ManagerTable,
+    AddSysUserDialog
   },
   data () {
     return {
@@ -45,25 +50,85 @@ export default {
       // 分页
       total: 0,
       currentPage: 1,
-      pageSize: 10
+      pageSize: 10,
+      // 筛选
+      filter: {}
     }
   },
   methods: {
-    // 筛选用户信息
-    onSearch (filters) {
-      console.log(JSON.stringify(filters))
+    onAddUser (user) {
+      this.$bus.$emit('show-loading-dialog')
+      this.api.sysuser.addSysuser(user)
+        .then(this.api.commonResp((success, data) => {
+          if (success) {
+            this.$message('添加成功')
+            this.$bus.$emit('change-add-sys-dialog', false)
+          } else {
+            this.$message.error('添加失败:' + data)
+          }
+        })).finally(() => {
+          this.$bus.$emit('hide-loading-dialog')
+        })
     },
-    pageChange (page) {
+    onUpdateUser (user) {
+      this.api.sysuser.updateUser(user)
+        .then(this.api.commonResp((success, data) => {
+          if (success) {
+            this.$message('保存成功')
+            this.$bus.$emit('change-edit-sys-dialog', false)
+          } else {
+            this.$message.error('保存失败:' + data)
+          }
+        })).finally(() => {
+          this.$bus.$emit('hide-loading-dialog')
+        })
+    },
+    // 筛选用户信息
+    onSearch (filter) {
+      this.filter = {}
+      Object.keys(filter).forEach((key) => {
+        let value = filter[key]
+        if (value) { this.filter[key] = value }
+      })
+      this.loadUserList()
+    },
+    onPageChange (page) {
       this.curPage = page
       this.loadUserList()
     },
+    onSizeChange (size) {
+      this.pageSize = size
+      this.loadUserList()
+    },
     deleteSelectedManagers () {
-      this.deleteManagers(this.selectedUserIds)
+      if (this.selectedUserIds.length === 0) {
+        this.$message.error('您还没有选择待删除的用户')
+        return
+      }
+      this.$confirm('此操作将永久删除这些用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteManagers(this.selectedUserIds)
+      })
     },
     deleteManagers (ids) {
-      console.log(ids)
+      this.$bus.$emit('show-loading-dialog')
+      this.api.sysuser.deleteSysusers(ids)
+        .then(this.api.commonResp((success, data) => {
+          if (success) {
+            this.$message('删除成功')
+            this.loadUserList()
+          } else {
+            this.$message.error('删除失败:' + data)
+          }
+        })).finally(() => {
+          this.$bus.$emit('hide-loading-dialog')
+        })
     },
     addManager () {
+      this.$bus.$emit('show-add-sys-dialog')
     },
     onManagerSelectChange (ids) {
       this.selectedUserIds = ids
@@ -71,7 +136,11 @@ export default {
     loadUserList () {
       this.listLoading = true
       this.api.sysuser
-        .getSysUserList(this.curPage, this.pageSize)
+        .getSysUserList({
+          curPage: this.curPage,
+          pageSize: this.pageSize,
+          ...this.filter
+        })
         .then(this.api.commonResp((success, data) => {
           if (success) {
             this.sysuserList = data.users
@@ -79,8 +148,9 @@ export default {
           } else {
             this.$message.error(data)
           }
+        })).finally(() => {
           this.listLoading = false
-        }))
+        })
     }
   }
 }

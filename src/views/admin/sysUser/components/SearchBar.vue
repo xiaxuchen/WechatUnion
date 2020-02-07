@@ -35,6 +35,14 @@
 
 <script>
 export default {
+  mounted () {
+    this.api.sysuser.getSysRoles()
+      .then(this.api.commonResp((success, data) => {
+        if (success) {
+          this.roleOptions = data
+        }
+      }))
+  },
   data () {
     return {
       filters: {

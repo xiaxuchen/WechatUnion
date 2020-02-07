@@ -46,12 +46,8 @@ export default {
     },
     // 关闭全部标签
     closeAll () {
-      this.tagsList = [{
-        name: 'index',
-        path: '/index',
-        title: '系统首页'
-      }]
-      this.$router.push('/')
+      this.tagsList = []
+      this.$router.push('/index')
     },
     // 关闭其他标签
     closeOther () {
@@ -63,15 +59,15 @@ export default {
     // 设置标签
     setTags (route) {
       const isExist = this.tagsList.some(item => {
-        return item.path === route.fullPath
+        return item.index === route.meta.index
       })
       !isExist && this.tagsList.push({
         title: route.meta.title,
         path: route.fullPath,
+        index: route.meta.index,
         // name: route.matched[1].components.default.name
         name: route.name
       })
-      this.$bus.$emit('tags', this.tagsList)
     },
     handleTags (command) {
       command === 'other' ? this.closeOther() : this.closeAll()
@@ -95,6 +91,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import url(../assets/stylesheet/common);
     @tag_height:34px;//tab高度变量
     .tags {
         position: relative;
@@ -149,7 +146,7 @@ export default {
     }
 
     .tags-li.active .tags-li-title {
-        color: #fff;
+        color: @brand;
     }
 
     .tags-close-box {
