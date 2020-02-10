@@ -1,4 +1,9 @@
 import Frame from '@/Frame'
+
+// function createComponent (name, ) {
+//
+// }
+
 export default [
   {
     path: '/',
@@ -34,21 +39,21 @@ export default [
         }
       },
       {
-        path: 'select',
-        name: 'selectReceiver',
-        component: () => import('@/views/agent/selectReceiver'),
+        path: 'push',
+        name: 'push',
+        component: () => import('@/views/agent/push'),
         meta: {
           title: '用户推送',
-          index: '/select'
+          index: '/push'
         }
       },
       {
-        path: 'pushInfo',
-        name: 'pushInfo',
-        component: () => import('@/views/agent/pushInfo'),
+        path: 'clientServe',
+        name: 'clientServe',
+        component: () => import('@/views/agent/clientServe'),
         meta: {
-          title: '用户推送',
-          index: '/select'
+          title: '用户接入',
+          index: '/clientServe'
         }
       },
       {

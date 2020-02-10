@@ -12,7 +12,9 @@ import store from '@/store'
 import 'font-awesome/css/font-awesome.min.css'
 import Common from '@/common/common'
 import VeLine from 'v-charts/lib/line.common'
+import 'animate.css'
 
+require('promise.prototype.finally').shim()
 // 初始化折线图
 Vue.component(VeLine.name, VeLine)
 
@@ -46,16 +48,17 @@ router.beforeEach((to, from, next) => {
       if (success) {
         next()
       }
-    })).finally(() => {
+    })).catch((e) => {
+      this.$message.error(e)
       loadingInstance.close()
     })
 })
 
-// router.afterEach(() => {
-//   if (loadingInstance) {
-//     loadingInstance.close()
-//   }
-// })
+router.afterEach(() => {
+  if (loadingInstance) {
+    loadingInstance.close()
+  }
+})
 
 /* eslint-disable no-new */
 new Vue({

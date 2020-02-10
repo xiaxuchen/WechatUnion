@@ -24,6 +24,7 @@
           </el-tab-pane>
         </el-tabs>
         <el-col align="right" style="padding: 20px">
+          <el-button @click="previewPush" >发送预览 <b class="el-icon-view"></b></el-button>
           <el-button type="primary" @click="sendPush" >发送 <b class="el-icon-s-promotion"></b></el-button>
         </el-col>
       </el-card>
@@ -32,7 +33,7 @@
 </template>
 
 <script>
-import MaterialDialog from './components/MaterialDialog'
+import MaterialDialog from './MaterialDialog'
 export default {
   data () {
     return {
@@ -49,10 +50,21 @@ export default {
     showMaterialDialog () {
       this.$bus.$emit('show-material-dialog')
     },
+    previewPush () {
+      let message = this.verify()
+      if (message) {
+        this.$emit('preview-push', message)
+      }
+    },
     sendPush () {
+      let message = this.verify()
+      if (message) {
+        this.$emit('send-push', message)
+      }
+    },
+    verify () {
       let type = 1
       let content = null
-      let users = []
       switch (this.activeMessage) {
         case '文本消息': {
           type = 1
@@ -65,28 +77,15 @@ export default {
           break
         }
       }
-      Object.keys(this.$store.state.push.selectedUserMap).forEach((key) => {
-        users.push(this.$store.state.push.selectedUserMap[key].id)
-      })
 
-      const loading = this.$loading({
-        lock: true,
-        text: 'Loading',
-        spinner: 'el-icon-loading',
-        background: 'rgba(0, 0, 0, 0.7)'
-      })
-
-      this.api.push.sendPush(users, {
+      if (content == null || content.trim() === '') {
+        this.$message.error('推送内容不能为空')
+        return null
+      }
+      return {
         type,
         content
-      }).then(this.api.commonResp((success, data) => {
-        if (success) {
-          this.$store.commit('push/clear')
-          this.$router.push({name: 'selectReceiver'})
-        }
-        this.$message(data)
-        loading.close()
-      }))
+      }
     }
   },
   components: {

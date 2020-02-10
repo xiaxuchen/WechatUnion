@@ -1,7 +1,7 @@
 <template>
     <div>
       <el-table
-        :data="userData.users"
+        :data="users"
         class="manager-list"
         v-loading="loading"
       >
@@ -60,10 +60,10 @@
         style="margin: 10px"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page.sync="userData.curPage"
-        :page-size="userData.pageSize"
+        :current-page.sync="curPage"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="userData.total">
+        :total="total">
       </el-pagination>
     </div>
 </template>
@@ -73,43 +73,42 @@ import { mapState } from 'vuex'
 export default {
   mounted () {
     // 初始化时获取一次用户信息
-    this.getUserList()
+    this.loadUserList()
     this.$bus.$on('releaseUser', (id) => {
-      let index = this.__.findIndex(this.userData.users, (item) => {
+      let index = this.__.findIndex(this.users, (item) => {
         return item.id === id
       })
-      this.userData.users[index].selected = false
+      this.users[index].selected = false
       // 让数组可以更新
-      this.userData.users.splice(index, 1, this.userData.users[index])
+      this.users.splice(index, 1, this.users[index])
+    })
+
+    this.$bus.$on('search-reload', () => {
+      this.loadUserList()
     })
   },
   props: {
-    tagSelected: {
-      type: Array,
-      required: true
-    }
+    tagSelected: Array,
+    phones: String
   },
   data () {
     return {
       // 是否正在加载
       loading: false,
-      // 用户数据信息
-      userData: {
-        // 总记录条数
-        total: 0,
-        // 每页的大小
-        pageSize: 10,
-        // 当前页码，从0开始
-        curPage: 1,
-        // 用户数据列表
-        users: []
-      }
+      // 用户数据列表
+      users: [],
+      // 总记录条数
+      total: 0,
+      // 每页的大小
+      pageSize: 10,
+      // 当前页码，从0开始
+      curPage: 1
     }
   },
   computed: {
     // 是否所有的用户都选中了
     isAllSelected () {
-      let every = this.__.every(this.userData.users, (item) => {
+      let every = this.__.every(this.users, (item) => {
         return item.selected
       })
       return every
@@ -124,16 +123,33 @@ export default {
     /**
      * 加载用户列表
      */
-    getUserList () {
+    loadUserList () {
+      if (this.phones.trim() !== '') {
+        let valid = this.phones.split(' ').every((phone) => {
+          if (!(/^1[3456789]\d{9}$/.test(phone))) {
+            return false
+          }
+          return true
+        })
+
+        if (!valid) {
+          this.$message.error('手机号码的格式错误')
+          return
+        }
+      }
+
       this.loading = true
-      this.api.push.getUserList(this.tagSelected,
-        this.userData.curPage,
-        this.userData.pageSize)
+      this.api.push.loadUserList(this.tagSelected,
+        this.curPage,
+        this.pageSize,
+        this.phones
+      )
         .then(this.api.commonResp((success, data) => {
           // 当请求成功了就更新数据列表
           if (success) {
-            this.userData = data
-            this.userData.users.forEach((item) => {
+            this.users = data.users
+            this.total = data.total
+            this.users.forEach((item) => {
               // 通过选中用户列表来设置是否选中
               item.selected = !(this.selectedUserList[`manager${item.id}`] === undefined || this.selectedUserList[`manager${item.id}`] == null)
             })
@@ -143,9 +159,13 @@ export default {
           this.loading = false
         }))
     },
-    handleSizeChange () {
+    handleSizeChange (size) {
+      this.pageSize = size
+      this.loadUserList()
     },
-    handleCurrentChange () {
+    handleCurrentChange (curPage) {
+      this.curPage = curPage
+      this.loadUserList()
     },
     /**
      * 切换选中
@@ -157,15 +177,15 @@ export default {
       } else {
         this.$store.commit('push/selectUser', row)
       }
-      let manager = this.userData.users[index]
+      let manager = this.users[index]
       manager.selected = !row.selected
-      this.userData.users.splice(index, 1, manager)
+      this.users.splice(index, 1, manager)
     },
     /**
      * 切换所有的选中，若全选了就全不选，若不是全选中就全选
      */
     toggleAllSelect () {
-      this.userData.users.forEach((item, index) => {
+      this.users.forEach((item, index) => {
         item.selected = this.isAllSelected
         this.toggleSelect(item, index)
       })

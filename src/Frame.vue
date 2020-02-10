@@ -12,7 +12,7 @@
         <el-scrollbar class="hidden-horizontal" :style="{height:scrollHeight + 'px'}">
           <transition name="move" mode="out-in">
             <keep-alive>
-              <router-view />
+              <router-view :height="scrollHeight"/>
             </keep-alive>
           </transition>
         </el-scrollbar>
@@ -30,8 +30,10 @@ import LoadingDialog from '@/components/LoadingDialog'
 export default {
   mounted () {
     this.scrollHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
+    this.$store.commit('system/setAvailableHeight', this.scrollHeight)
     window.onresize = () => {
       this.scrollHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
+      this.$store.commit('system/setAvailableHeight', this.scrollHeight)
     }
   },
   data () {
@@ -45,12 +47,12 @@ export default {
         {
           title: '用户接线',
           iconClass: 'fa fa-address-book',
-          path: '/linkUser'
+          path: '/clientServe'
         },
         {
           title: '用户推送',
           iconClass: 'fa fa-rocket',
-          path: '/select'
+          path: '/push'
         },
         {
           title: '系统管理',

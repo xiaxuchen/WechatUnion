@@ -1,5 +1,5 @@
 <template>
-    <div class="panel">
+    <div class="panel" :class="{active:border}">
       <div class="panel_title" :style="titleStyle">
         <slot name="title" >{{title}}</slot>
       </div>
@@ -19,15 +19,22 @@ export default {
     title: {
       type: String,
       required: false
+    },
+    border: {
+      type: Boolean,
+      default: true
     }
   }
 }
 </script>
 
 <style scoped lang="less">
+  @borderRadius: 3px;
   .panel {
-    border: 1px solid #dcdfe6;
+    border-radius: @borderRadius;
     .panel_title {
+      border-top-left-radius: @borderRadius;
+      border-top-right-radius: @borderRadius;
       text-align: left;
       padding: 14px 20px;
       background-color: #f2f6fc;
@@ -35,8 +42,11 @@ export default {
       font-size: 14px;
     }
 
+    &.active {
+      border: 1px solid #bfbfbf;
+    }
+
     .panel_content {
-      padding: 10px 20px;
     }
   }
 </style>

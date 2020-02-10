@@ -2,9 +2,9 @@
   <div class="about-info">
     <el-row>
       <el-col :span="12" align="center">
-        <panel title="推送总览" style="width: 400px">
+        <panel title="推送总览" style="width: 400px" :border="true">
           <template>
-            <el-row>
+            <el-row class="padding-md">
               <el-col :span="6">
                 <panel-item count="100" text="推送人数" />
               </el-col>
@@ -22,9 +22,9 @@
         </panel>
       </el-col>
       <el-col :span="12" align="center">
-        <panel title="用户总览" style="width: 400px">
+        <panel title="用户总览" style="width: 400px" :border="true">
           <template>
-            <el-row>
+            <el-row class="padding-sm">
               <el-col :span="6">
                 <panel-item count="9563" text="总用户数" />
               </el-col>

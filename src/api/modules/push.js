@@ -17,11 +17,12 @@ export default {
    * @param pageSize 页面大小
    * @returns {*}
    */
-  getUserList (tagList, curPage, pageSize) {
+  loadUserList (tagList, curPage, pageSize, phone) {
     return http.get('/push/userList', {
       tagList,
       curPage,
-      pageSize
+      pageSize,
+      phone
     })
   },
   /**

@@ -47,6 +47,10 @@ export default {
     // 关闭全部标签
     closeAll () {
       this.tagsList = []
+      if (this.$route.path === '/index') {
+        this.setTags(this.$route)
+        return
+      }
       this.$router.push('/index')
     },
     // 关闭其他标签

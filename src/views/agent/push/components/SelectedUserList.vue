@@ -60,12 +60,12 @@
     <el-pagination
       class="fl"
       style="margin: 10px"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
       :current-page.sync="userData.curPage"
       :page-size="userData.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="userData.total">
-      <!--  @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"-->
     </el-pagination>
     <bottom-button-dialog :visible.sync="uploadDialogVisible" :bottom-visible="false">
       <template slot="title">
