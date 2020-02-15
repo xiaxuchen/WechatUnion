@@ -1,6 +1,6 @@
 <template>
     <div class="panel-item">
-      <div class="count">{{count}}</div>
+      <div class="count">{{count? count: ''}}</div>
       <div class="text">{{text}}</div>
     </div>
 </template>
@@ -9,8 +9,7 @@
 export default {
   props: {
     count: {
-      type: Number,
-      required: true
+      type: Number
     },
     text: {
       type: String,

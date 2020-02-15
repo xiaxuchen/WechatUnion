@@ -6,16 +6,16 @@
           <template>
             <el-row class="padding-md">
               <el-col :span="6">
-                <panel-item count="100" text="推送人数" />
+                <panel-item :count="aboutInfo.allPushCount" text="推送人数" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="10" text="当日接受" />
+                <panel-item :count="aboutInfo.lastDayReceiveCount" text="昨日接收" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="8000" text="本月次数" />
+                <panel-item :count="aboutInfo.theMounthPushCount" text="本月次数" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="100" text="本月接受" />
+                <panel-item :count="aboutInfo.theMounthReceiveCount" text="本月接收" />
               </el-col>
             </el-row>
           </template>
@@ -26,16 +26,16 @@
           <template>
             <el-row class="padding-sm">
               <el-col :span="6">
-                <panel-item count="9563" text="总用户数" />
+                <panel-item :count="aboutInfo.allUserCount" text="总用户数" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="3000" text="绑定用户数" />
+                <panel-item :count="aboutInfo.bindUserCount" text="绑定用户数" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="12" text="昨日新增" />
+                <panel-item :count="aboutInfo.lastDayUserAddCount" text="昨日新增" />
               </el-col>
               <el-col :span="6">
-                <panel-item count="100" text="本月新增" />
+                <panel-item :count="aboutInfo.theMounthUserAddCount" text="本月新增" />
               </el-col>
             </el-row>
           </template>
@@ -49,6 +49,12 @@
 import Panel from '@/components/Panel'
 import PanelItem from './PanelItem'
 export default {
+  props: {
+    aboutInfo: {
+      type: Object,
+      required: true
+    }
+  },
   components: {
     Panel,
     PanelItem

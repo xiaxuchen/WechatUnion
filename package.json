@@ -16,6 +16,8 @@
   "dependencies": {
     "animate.css": "^3.7.2",
     "axios": "^0.19.2",
+    "babel-polyfill": "^6.26.0",
+    "chai": "^4.2.0",
     "echarts": "^4.6.0",
     "element-ui": "^2.13.0",
     "font-awesome": "^4.7.0",

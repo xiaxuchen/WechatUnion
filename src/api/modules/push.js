@@ -30,5 +30,11 @@ export default {
    */
   getMaterialList () {
     return http.get('/push/materials')
+  },
+  /**
+   * 获取首页的数据
+   */
+  getIndexData () {
+    return http.get('/indexData')
   }
 }

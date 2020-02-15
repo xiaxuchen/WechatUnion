@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'babel-polyfill'
 import Vuex from 'vuex'
 import createLogger from 'vuex/dist/logger'
 import push from './modules/push'

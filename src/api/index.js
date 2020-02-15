@@ -9,12 +9,14 @@ export default {
   push,
   sysuser,
   commonResp (fn) {
-    return function (resp) {
+    return function (resp, vue) {
       let data = resp.data
       if (data.code === 1) {
         if (fn) { fn(true, data.data, resp) }
       } else {
-        if (fn) { fn(false, data.msg, resp) }
+        if (fn && !vue) { fn(false, data.msg, resp) } else {
+          vue.$message.error(data.msg)
+        }
       }
     }
   }

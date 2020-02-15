@@ -1,11 +1,12 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import 'babel-polyfill'
 import App from './App'
 import router from './router'
 import 'element-ui/lib/theme-chalk/index.css'
 import ElementUI from 'element-ui'
-import storage from './utils/storage'
+import './utils/storage'
 import api from '@/api'
 import __ from 'lodash'
 import store from '@/store'
@@ -19,9 +20,6 @@ require('promise.prototype.finally').shim()
 Vue.component(VeLine.name, VeLine)
 
 Vue.config.productionTip = false
-
-// 防止报错
-console.log(storage)
 
 // 将常用库以及网络请求加入vue实例，方便调用
 Vue.prototype.api = api
