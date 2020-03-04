@@ -8,13 +8,27 @@
         v-loading="listLoading"
         @selection-change="selectChange">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="编号" />
+        <el-table-column prop="userId" label="编号" />
+        <el-table-column label="头像">
+          <template slot-scope="{row}">
+            <head-image :url="row.headImg" class="head-img" />
+          </template>
+        </el-table-column>
         <el-table-column prop="username" label="用户名">
           <template slot-scope="scope">
             <el-button type="text" size="small">{{scope.row.username}}</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="sex" label="性别" :formatter="formatSex" sortable />
+        <el-table-column prop="agentInfo.sex" label="性别" sortable >
+          <template slot-scope="{row}">
+            <span v-if="row.agentInfo">
+              {{row.agentInfo.sex | formatSex}}
+            </span>
+            <span v-else>
+              未知
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="state" label="是否有效" :formatter="formatState" sortable />
         <el-table-column
           label="创建时间"
@@ -39,8 +53,10 @@
 <script>
 import EditSysUserDialog from './EditSysUserDialog'
 import ShowRoleDialog from './ShowRoleDialog'
+import HeadImage from '@/components/HeadImage'
 export default {
   components: {
+    HeadImage,
     EditSysUserDialog,
     ShowRoleDialog
   },
@@ -56,7 +72,7 @@ export default {
   },
   methods: {
     selectChange (list) {
-      this.$emit('select-change', list.map((item) => item.id))
+      this.$emit('select-change', list.map((item) => item.userId))
     },
     // 性别显示转换
     formatSex: function (row, column) {
@@ -95,6 +111,11 @@ export default {
 
     &>.right {
       margin-left: @leftWidth;
+    }
+
+    .head-img {
+      width: 64px;
+      height: 64px;
     }
   }
 </style>

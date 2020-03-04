@@ -24,37 +24,82 @@
           </el-tab-pane>
         </el-tabs>
         <el-col align="right" style="padding: 20px">
-          <el-button @click="previewPush" >发送预览 <b class="el-icon-view"></b></el-button>
+          <el-button @click="onPreviewPush" :loading="previewLoading" >发送预览 <b class="el-icon-view"></b></el-button>
           <el-button type="primary" @click="sendPush" >发送 <b class="el-icon-s-promotion"></b></el-button>
         </el-col>
       </el-card>
+      <bottom-button-dialog :bottom-visible="false" :visible.sync="qrCodeVisible" width="20">
+        <div>
+          <el-row>
+            <el-col align="center">
+              <el-image :src="url"  style="width: 200px;height: 200px" fit="cover"/>
+              <div class="text-center">请使用微信扫码</div>
+              <div class="text-center text-warning">{{hintTxt}}</div>
+            </el-col>
+          </el-row>
+        </div>
+      </bottom-button-dialog>
       <material-dialog @on-check-material="checkMaterial" />
     </div>
 </template>
 
 <script>
 import MaterialDialog from './MaterialDialog'
+import BottomButtonDialog from '@/components/BottomButtonDialog'
 export default {
   data () {
     return {
       activeMessage: '文本消息',
       textMessage: '',
-      picTextId: null
+      picTextId: null,
+      previewLoading: false,
+      url: null,
+      qrCodeVisible: false,
+      hintTxt: '',
+      curIntervalId: null
     }
   },
   methods: {
+    /**
+     * 预览推送,同时监听状态
+     * @param pushInfo
+     */
+    onPreviewPush () {
+      let message = this.verify()
+      if (!message) {
+        return
+      }
+      this.previewLoading = true
+      this.api.push.previewPush(null, message.type, message.content)
+        .then(this.api.commonResp((success, data) => {
+          clearInterval(this.curIntervalId)
+          this.curIntervalId = setInterval(() => {
+            this.api.push.getPreviewState(data.pushItemId)
+              .then(this.api.commonResp((success, data) => {
+                if (success) {
+                  if (data === 1) {
+                    this.hintTxt = '发送成功'
+                    clearInterval(this.curIntervalId)
+                  } else if (data === -1) {
+                    this.hintTxt = '预览已过期'
+                    clearInterval(this.curIntervalId)
+                  }
+                }
+              }))
+          }, 2000)
+          this.url = data.url
+          this.qrCodeVisible = true
+          this.hintTxt = ''
+        }, this)).finally(() => {
+          this.previewLoading = false
+        })
+    },
     checkMaterial (id) {
       console.log(id)
       this.picTextId = id
     },
     showMaterialDialog () {
       this.$bus.$emit('show-material-dialog')
-    },
-    previewPush () {
-      let message = this.verify()
-      if (message) {
-        this.$emit('preview-push', message)
-      }
     },
     sendPush () {
       let message = this.verify()
@@ -67,12 +112,12 @@ export default {
       let content = null
       switch (this.activeMessage) {
         case '文本消息': {
-          type = 1
+          type = 0
           content = this.textMessage
           break
         }
         case '图文消息': {
-          type = 2
+          type = 1
           content = this.picTextId
           break
         }
@@ -89,7 +134,8 @@ export default {
     }
   },
   components: {
-    MaterialDialog
+    MaterialDialog,
+    BottomButtonDialog
   }
 }
 </script>

@@ -41,7 +41,7 @@
         min-width="200"
       >
         <template slot-scope="{row}">
-          <el-tag v-for="tag in row.tagList" :key="tag.id" style="margin: 5px">
+          <el-tag v-for="tag in row.tags" :key="tag.id" style="margin: 5px">
             {{tag.name}}
           </el-tag>
         </template>
@@ -81,6 +81,7 @@ export default {
       this.users[index].selected = false
       // 让数组可以更新
       this.users.splice(index, 1, this.users[index])
+      this.updateIsAllSelected()
     })
 
     this.$bus.$on('search-reload', () => {
@@ -102,24 +103,41 @@ export default {
       // 每页的大小
       pageSize: 10,
       // 当前页码，从0开始
-      curPage: 1
+      curPage: 1,
+      isAllSelected: false
     }
   },
   computed: {
-    // 是否所有的用户都选中了
-    isAllSelected () {
-      let every = this.__.every(this.users, (item) => {
-        return item.selected
-      })
-      return every
-    },
     ...mapState({
       selectedUserList: state => {
         return state.push.selectedUserMap
-      }
+      },
+      selectedSize: state => state.push.selectedSize
     })
   },
+  watch: {
+    users: {
+      handler () {
+        this.updateIsAllSelected()
+      },
+      immediate: true
+    },
+    selectedSize: {
+      handler () {
+        this.updateIsAllSelected()
+      },
+      immediate: true
+    }
+  },
   methods: {
+    updateIsAllSelected () {
+      if (this.users && this.users.length > 0) {
+        this.isAllSelected = this.__.every(this.users, (item) => {
+          console.log(item.selected)
+          return item.selected
+        })
+      }
+    },
     /**
      * 加载用户列表
      */
@@ -147,11 +165,11 @@ export default {
         .then(this.api.commonResp((success, data) => {
           // 当请求成功了就更新数据列表
           if (success) {
-            this.users = data.users
+            this.users = data.data
             this.total = data.total
             this.users.forEach((item) => {
               // 通过选中用户列表来设置是否选中
-              item.selected = !(this.selectedUserList[`manager${item.id}`] === undefined || this.selectedUserList[`manager${item.id}`] == null)
+              item.selected = !(this.selectedUserList[`user${item.id}`] === undefined || this.selectedUserList[`user${item.id}`] == null)
             })
           } else {
             this.$message.error(data)
@@ -173,22 +191,31 @@ export default {
      */
     toggleSelect (row, index) {
       if (row.selected) {
-        this.$store.commit('push/releaseUser', row)
+        this.$store.commit('push/releaseUsers', [row])
       } else {
-        this.$store.commit('push/selectUser', row)
+        this.$store.commit('push/addUsers', [row])
       }
       let manager = this.users[index]
-      manager.selected = !row.selected
+      // 更新
       this.users.splice(index, 1, manager)
     },
     /**
      * 切换所有的选中，若全选了就全不选，若不是全选中就全选
      */
     toggleAllSelect () {
-      this.users.forEach((item, index) => {
-        item.selected = this.isAllSelected
-        this.toggleSelect(item, index)
-      })
+      let users = this.users
+      if (this.isAllSelected) {
+        this.$store.commit('push/releaseUsers', this.users)
+        users.forEach(item => {
+          item.selected = false
+        })
+      } else {
+        this.$store.commit('push/addUsers', this.users)
+        users.forEach(item => {
+          item.selected = true
+        })
+      }
+      this.users = [...users]
     }
   }
 }

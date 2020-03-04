@@ -11,15 +11,25 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="登录密码" prop="password">
-                <el-input v-model="addForm.password"></el-input>
+                <el-input v-model="addForm.password" />
               </el-form-item>
             </el-col>
           </el-row>
+          <el-row style="margin-left: -10px;">
+            <el-col :span="12">
+              <el-form-item label="电话" >
+                <el-input v-model="addForm.phone" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="头像" >
+            <upload-image @on-image-change="onImageChange" :cur-image="addForm.headImg"/>
+          </el-form-item>
           <el-form-item label="客户经理">
             <el-switch v-model="addForm.isAgent"></el-switch>
           </el-form-item>
-          <template v-if="addForm.isAgent">
-            <el-row style="margin-left: -10px;">
+          <template v-if="addForm.isAgent" style="margin-left: -10px;">
+            <el-row>
               <el-col :span="12">
                 <el-form-item label="姓名" prop="name">
                   <el-input v-model="addForm.name"></el-input>
@@ -28,9 +38,9 @@
               <el-col :span="12">
                 <el-form-item label="性别">
                   <el-select v-model="addForm.sex" placeholder="请选择性别">
-                    <el-option label="未知" :value="-1"></el-option>
+                    <el-option label="未知" :value="0"></el-option>
                     <el-option label="男" :value="1"></el-option>
-                    <el-option label="女" :value="0"></el-option>
+                    <el-option label="女" :value="2"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -38,8 +48,8 @@
             <el-form-item label="客服账号" prop="account">
               <el-input v-model="addForm.account"></el-input>
             </el-form-item>
-            <el-form-item label="自我简介" prop="desc">
-              <el-input type="textarea" v-model="addForm.desc"></el-input>
+            <el-form-item label="自我简介" prop="des">
+              <el-input type="textarea" v-model="addForm.des"></el-input>
             </el-form-item>
           </template>
         </el-form>
@@ -49,6 +59,8 @@
 
 <script>
 import BottomButtonDialog from '@/components/BottomButtonDialog'
+import HeadImage from '@/components/HeadImage'
+import UploadImage from './UploadImage'
 const FormInit = {
   username: '',
   password: '',
@@ -56,15 +68,20 @@ const FormInit = {
   name: '',
   sex: null,
   account: '',
-  desc: ''
+  phone: '',
+  des: '',
+  headImg: ''
 }
 export default {
   components: {
-    BottomButtonDialog
+    HeadImage,
+    BottomButtonDialog,
+    UploadImage
   },
   data () {
     return {
       addForm: {...FormInit},
+      headImgUrl: '',
       visible: false,
       rules: {
         username: [
@@ -85,9 +102,17 @@ export default {
     })
   },
   methods: {
+    onImageChange (url) {
+      this.addForm.headImg = url
+      this.headImgUrl = url
+    },
     addUser () {
       this.$refs.addForm.validate((valid) => {
         if (valid) {
+          if (this.headImgUrl == null) {
+            this.$message.error('请上传用户头像')
+            return true
+          }
           this.$emit('add-user', this.addForm)
         } else {
           this.$message.error('请按要求填写用户信息')
@@ -122,5 +147,4 @@ export default {
 </script>
 
 <style scoped lang="less">
-
 </style>

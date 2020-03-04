@@ -6,13 +6,14 @@
     <el-table
       :data="userData.users"
       class="manager-list"
+      :v-loading="loading"
     >
       <el-table-column width="100">
         <template slot="header" slot-scope="scope" v-if="selectedSize !== 0">
           <el-button  class="icon el-icon-minus" @click="toggleAllSelect"></el-button>
         </template>
         <template slot-scope="{row,$index}">
-          <el-button :type="row.selected?'':'primary'" class="icon" :class="[row.selected?'el-icon-minus': 'el-icon-plus']" @click="toggleSelect(row,$index)"></el-button>
+          <el-button :type="row.selected?'':'primary'" class="icon" :class="[row.selected?'el-icon-minus': 'el-icon-plus']" @click="releaseUser(row,$index)"></el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -78,6 +79,7 @@
             accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             :action="excelUploadAction"
             :on-success="addUsersToList"
+            :headers="headers"
             multiple>
             <i class="el-icon-upload"></i>
             <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -104,7 +106,9 @@ export default {
         users: []
       },
       uploadDialogVisible: false,
-      excelUploadAction: this.api.baseURL + '/user/pushUserExcel'
+      excelUploadAction: this.api.baseURL + '/push/users/excel',
+      headers: {Authorization: this.$store.state.manager.token},
+      loading: false
     }
   },
   computed: {
@@ -115,16 +119,30 @@ export default {
   watch: {
     selectedSize: {
       handler () {
-        this.userData.users = this.getSelectedUserList()
-        this.userData.total = this.selectedSize
+        this.update()
       },
       immediate: true
     }
   },
   methods: {
+    update () {
+      this.loading = true
+      this.userData.users = this.getSelectedUserList()
+      this.userData.total = this.selectedSize
+      this.loading = false
+    },
+    handleCurrentChange () {
+      this.update()
+    },
+    handleSizeChange (size) {
+      this.userData.pageSize = size
+      this.update()
+    },
     addUsersToList (response) {
       if (response.success) {
         this.$store.commit('push/addUsers', response.data)
+        this.uploadDialogVisible = false
+        this.$message('导入成功')
       } else {
         this.$message.error(response.msg)
       }
@@ -142,27 +160,27 @@ export default {
       })
       let {pageSize, curPage} = this.userData
       // 将list截取当前页的数据
-      return list.slice((curPage - 1) * pageSize, curPage * pageSize - 1)
+      return list.slice((curPage - 1) * pageSize, curPage * pageSize)
     },
     /**
      * 切换选中
      * @param row 行数据
      */
-    toggleSelect (row) {
+    releaseUser (row) {
       if (row.selected) {
-        this.$store.commit('push/releaseUser', row)
+        this.$store.commit('push/releaseUsers', [row])
         this.$bus.$emit('releaseUser', row.id)
       } else {
-        this.$store.commit('push/selectUser', row)
+        this.$store.commit('push/addUsers', [row])
       }
     },
     /**
      * 切换所有的选中，若全选了就全不选，若不是全选中就全选
      */
     toggleAllSelect () {
-      this.userData.users.forEach((item, index) => {
-        item.selected = true
-        this.toggleSelect(item, index)
+      this.$store.commit('push/releaseUsers', this.userData.users)
+      this.userData.users.forEach(user => {
+        this.$bus.$emit('releaseUser', user.id)
       })
     }
   },

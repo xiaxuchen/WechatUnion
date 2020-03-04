@@ -3,11 +3,11 @@
       <!-- 查看角色 -->
       <el-dialog title="查看角色" :visible.sync="visible" :close-on-click-modal="false">
         <el-form :model="infoForm" label-width="80px"  ref="infoForm" :inline="true">
-          <el-form-item label="姓名" prop="username">
+          <el-form-item label="用户名" prop="username">
             <el-input v-model="infoForm.username" auto-complete="off" :disabled="true"></el-input>
           </el-form-item>
-          <el-form-item label="编码" prop="id">
-            <el-input v-model="infoForm.id" auto-complete="off" :disabled="true"></el-input>
+          <el-form-item label="编码" prop="userId">
+            <el-input v-model="infoForm.userId" auto-complete="off" :disabled="true"></el-input>
           </el-form-item>
         </el-form>
         <el-form  label-width="80px" :inline="true">

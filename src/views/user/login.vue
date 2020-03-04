@@ -45,7 +45,6 @@ export default {
   data () {
     return {
       logining: false,
-      loginError: '',
       ruleForm: {
         username: '',
         password: ''
@@ -56,15 +55,6 @@ export default {
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 6, max: 20, message: '用户名长度在6到20位之间', trigger: 'blur' }]
       },
       checked: false
-    }
-  },
-  watch: {
-    loginError (newValue) {
-      this.$message.error({
-        title: '出错了',
-        message: newValue,
-        type: 'error'
-      })
     }
   },
   methods: {
@@ -86,10 +76,13 @@ export default {
                 vm.$store.commit('manager/setManager', data)
                 vm.$router.push({ name: 'index' })
               } else {
-                vm.loginError = data
+                this.$message.error(data)
               }
+            })).catch(reason => {
+              this.$message.error(reason)
+            }).finally(() => {
               this.logining = false
-            }))
+            })
         }
       })
     }

@@ -1,18 +1,28 @@
 import axios from 'axios'
 import qs from 'qs'
-const baseURL = 'http://rest.apizza.net/mock/4b3bc197a2d00928b7e3a9f0a4932342'
-
+// const baseURL = 'http://rest.apizza.net/mock/4b3bc197a2d00928b7e3a9f0a4932342'
+const baseURL = 'http://localhost'
 let http = axios.create({
   baseURL: baseURL
 })
 
 // 请求发前拦截，header中添加token
 http.interceptors.request.use(config => {
-  if (window.storage.getItem('manager/token')) {
-    config.headers['Authorization'] = window.storage.getItem('manager/token') || ''
+  const token = window.storage.getItem('manager/token')
+  console.log(token)
+  if (token != null) {
+    config.headers.Authorization = token
   }
   return config
 })
+
+// 添加响应拦截器
+// axios.interceptors.response.use(function (response) {
+//   // 对响应数据做点什么
+//   return response
+// }, function (error) {
+//   return Promise.reject(error)
+// })
 
 const get = function (apiPath, params) {
   handleNullParam(params)

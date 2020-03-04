@@ -15,14 +15,24 @@
               </el-form-item>
             </el-col>
           </el-row>
+          <el-row style="margin-left: -10px;">
+            <el-col :span="12">
+              <el-form-item label="电话" >
+                <el-input v-model="editForm.phone" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-form-item label="头像" >
+            <upload-image @on-image-change="onImageChange" :cur-image="editForm.headImg"/>
+          </el-form-item>
           <el-form-item label="是否禁用">
             <el-switch v-model="editForm.isInvalid" />
           </el-form-item>
           <el-form-item label="客户经理">
             <el-switch v-model="editForm.isAgent" />
           </el-form-item>
-          <template v-if="editForm.isAgent">
-            <el-row style="margin-left: -10px;">
+          <template v-if="editForm.isAgent" style="margin-left: -10px;">
+            <el-row >
               <el-col :span="12">
                 <el-form-item label="姓名" prop="name">
                   <el-input v-model="editForm.agentInfo.name"></el-input>
@@ -31,9 +41,9 @@
               <el-col :span="12">
                 <el-form-item label="性别">
                   <el-select v-model="editForm.agentInfo.sex" placeholder="请选择性别">
-                    <el-option label="未知" :value="-1"></el-option>
+                    <el-option label="未知" :value="0"></el-option>
                     <el-option label="男" :value="1"></el-option>
-                    <el-option label="女" :value="0"></el-option>
+                    <el-option label="女" :value="2"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -41,8 +51,8 @@
             <el-form-item label="客服账号" prop="account">
               <el-input v-model="editForm.agentInfo.account"></el-input>
             </el-form-item>
-            <el-form-item label="自我简介" prop="desc">
-              <el-input type="textarea" v-model="editForm.agentInfo.desc"></el-input>
+            <el-form-item label="自我简介" prop="des">
+              <el-input type="textarea" v-model="editForm.agentInfo.des"></el-input>
             </el-form-item>
           </template>
         </el-form>
@@ -52,21 +62,25 @@
 
 <script>
 import BottomButtonDialog from '@/components/BottomButtonDialog'
+import UploadImage from './UploadImage'
 const FormInit = {
   username: '',
   password: '',
+  phone: '',
+  sex: 0,
   isAgent: false,
   isInvalid: false,
+  headImg: '',
   agentInfo: {
     name: '',
-    sex: -1,
     account: '',
-    desc: ''
+    des: ''
   }
 }
 export default {
   components: {
-    BottomButtonDialog
+    BottomButtonDialog,
+    UploadImage
   },
   data () {
     return {
@@ -82,25 +96,36 @@ export default {
   },
   mounted () {
     this.$bus.$on('change-edit-sys-dialog', (visible, formData) => {
+      console.log(JSON.stringify(formData))
       if (visible) {
         let editForm = {...formData}
         editForm.isInvalid = editForm.state === 0
         editForm.isAgent = formData.roles ? formData.roles.some((item) => { return item.id === 2 }) : false
+        if (!editForm.isAgent) {
+          editForm.agentInfo = {}
+        }
         this.editForm = editForm
       }
       this.visible = visible
     })
   },
   methods: {
+    onImageChange (url) {
+      this.editForm = Object.assign({
+        headImg: url
+      }, this.editForm)
+    },
     saveUser () {
       this.$refs.editForm.validate((valid) => {
         if (valid) {
           this.visible = false
           // 必须属性之间加入
           let saveUser = {
+            userId: this.editForm.userId,
             username: this.editForm.username,
             isAgent: this.editForm.isAgent,
-            isInvalid: this.editForm.isInvalid
+            isInvalid: this.editForm.isInvalid,
+            headImg: this.editForm.headImg
           }
           // 检查密码格式
           if (this.editForm.password) {
@@ -113,7 +138,13 @@ export default {
           }
           // 如果是经理，就加入经理信息
           if (this.editForm.isAgent) {
-            saveUser.agentInfo = this.editForm.agentInfo
+            let agentInfo = {...this.editForm.agentInfo}
+            agentInfo.agentId = agentInfo.id
+            delete agentInfo.id
+            // 将客户经理的信息复制进用户信息中
+            Object.keys(agentInfo).forEach(key => {
+              saveUser[key] = agentInfo[key]
+            })
           }
 
           this.$emit('save-user', saveUser)

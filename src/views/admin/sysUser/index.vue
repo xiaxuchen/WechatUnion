@@ -8,7 +8,6 @@
     <manager-table
       :sysuser-list="sysuserList"
       :list-loading="listLoading"
-      @delete-manager="deleteManagers([$event])"
       @select-change="onManagerSelectChange"
       @update-user="onUpdateUser"
     />
@@ -33,6 +32,9 @@ export default {
   mounted () {
     // 初始加载用户信息
     this.loadUserList()
+    this.$bus.$on('on-user-list-update', () => {
+      this.loadUserList()
+    })
   },
   components: {
     SearchBar,
@@ -63,6 +65,7 @@ export default {
           if (success) {
             this.$message('添加成功')
             this.$bus.$emit('change-add-sys-dialog', false)
+            this.$bus.$emit('on-user-list-update')
           } else {
             this.$message.error('添加失败:' + data)
           }
@@ -76,6 +79,7 @@ export default {
           if (success) {
             this.$message('保存成功')
             this.$bus.$emit('change-edit-sys-dialog', false)
+            this.$bus.$emit('on-user-list-update')
           } else {
             this.$message.error('保存失败:' + data)
           }
@@ -115,7 +119,12 @@ export default {
     },
     deleteManagers (ids) {
       this.$bus.$emit('show-loading-dialog')
-      this.api.sysuser.deleteSysusers(ids)
+      // 拼接字符串为id,id的形式
+      let idStr = ids.reduce((pre, cur) => {
+        if (pre === '') { return cur + '' }
+        return pre + ',' + cur
+      }, '')
+      this.api.sysuser.deleteSysuser(idStr)
         .then(this.api.commonResp((success, data) => {
           if (success) {
             this.$message('删除成功')
@@ -128,9 +137,10 @@ export default {
         })
     },
     addManager () {
-      this.$bus.$emit('show-add-sys-dialog')
+      this.$bus.$emit('change-add-sys-dialog', true)
     },
     onManagerSelectChange (ids) {
+      console.log(ids)
       this.selectedUserIds = ids
     },
     loadUserList () {
@@ -143,7 +153,7 @@ export default {
         })
         .then(this.api.commonResp((success, data) => {
           if (success) {
-            this.sysuserList = data.users
+            this.sysuserList = data.data
             this.total = data.total
           } else {
             this.$message.error(data)

@@ -1,34 +1,41 @@
 <template>
     <div class="user-item" :class="{active:active}">
-      <el-row>
-        <el-col :span="6">
-          <el-image :src="require('@/assets/images/0.png')" class="head-img"/>
-        </el-col>
-        <el-col :span="18">
-          <el-row>
-            <el-col class="nickname" :span="12">
-              夏旭晨
-            </el-col>
-            <el-col class="tel" :span="12">
-              17779911413
-            </el-col>
-          </el-row>
-          <el-row style="margin-top: 5px">
-            <el-col :span="18" class="last-info">
-              你好啊
-            </el-col>
-            <el-col :span="6" class="state">
-              已超时
-            </el-col>
-          </el-row>
-        </el-col>
-      </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-image :src="userInfo.headImg" class="head-img"/>
+          </el-col>
+          <el-col :span="18">
+            <el-row>
+              <el-col class="nickname" :span="10">
+                {{userInfo.name}}
+              </el-col>
+              <el-col class="tel" :span="12">
+                {{userInfo.phone}}
+              </el-col>
+              <el-col :span="2">
+                <el-badge :value="userInfo.notRead" v-show="userInfo.notRead > 0" class="item" />
+              </el-col>
+            </el-row>
+            <el-row style="margin-top: 5px">
+              <el-col :span="12" class="last-info">
+                  {{userInfo.lastMessage}}
+              </el-col>
+              <el-col :span="10" class="state">
+                {{userInfo.lastTime}}
+              </el-col>
+            </el-row>
+          </el-col>
+        </el-row>
     </div>
 </template>
 
 <script>
 export default {
   props: {
+    userInfo: {
+      type: Object,
+      required: true
+    },
     active: {
       type: Boolean,
       required: false,

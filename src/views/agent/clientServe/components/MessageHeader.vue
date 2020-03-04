@@ -2,7 +2,7 @@
     <div class="message-header">
       <el-row>
         <el-col :span="2">
-          夏旭晨
+          {{chatUser.name}}
         </el-col>
         <el-col :span="1" :push="20">
           <el-tooltip effect="dark" content="转接" placement="bottom" class="icon-button">
@@ -19,7 +19,13 @@
 </template>
 
 <script>
-export default {}
+export default {
+  computed: {
+    chatUser () {
+      return this.$store.state.message.curChatUser
+    }
+  }
+}
 </script>
 
 <style scoped lang="less">

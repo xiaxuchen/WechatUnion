@@ -23,15 +23,15 @@
                     <span class="btn-bell-badge" v-if="message"></span>
                 </div>
                 <!-- 用户头像 -->
-                <div class="user-avator"><img src="@/assets/images/0.png/"></div>
+                <div class="user-avator"><head-image class="avator" :url="userInfo.headImg" :styles="{borderRadius: '100%',width: '40px',height: '40px'}" /></div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
+                        {{userInfo.username}} <i class="el-icon-caret-bottom" />
                     </span>
 
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item divided  command="loginOut">退出登录</el-dropdown-item>
+                        <el-dropdown-item divided  command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -39,7 +39,10 @@
     </div>
 </template>
 <script>
+import {mapState} from 'vuex'
+import HeadImage from '@/components/HeadImage'
 export default {
+  components: {HeadImage},
   data () {
     return {
       fullScreen: false,
@@ -47,15 +50,22 @@ export default {
     }
   },
   computed: {
-    username () {
-      return 'xxc'
-    }
+    ...mapState({
+      userInfo: state => state.manager.manager
+    })
   },
   methods: {
     // 用户名下拉菜单选择事件
     handleCommand (command) {
-      if (command === 'loginOut') {
-        this.$router.push('/login')
+      if (command === 'logout') {
+        this.$bus.$emit('show-loading-dialog')
+        this.$store.dispatch('manager/logout').then(value => {
+          this.$router.push('/login')
+        }).catch(reason => {
+          this.$message.error(reason)
+        }).finally(() => {
+          this.$bus.$emit('hide-loading-dialog')
+        })
       }
     },
     // 侧边栏折叠
@@ -153,7 +163,11 @@ export default {
         margin-left: 10px;
     }
     .user-avator{
-        margin-left: 20px;
+      margin-left: 20px;
+      .avator{
+        width: 48px;
+        height: 48px;
+      }
     }
     .user-avator img{
         display: block;

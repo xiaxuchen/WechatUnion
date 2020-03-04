@@ -1,3 +1,4 @@
+import api from '@/api'
 const manager = window.storage.getItem('manager/manager')
 const token = window.storage.getItem('manager/token')
 const state = {
@@ -13,11 +14,25 @@ const mutations = {
   setToken (state, token) {
     state.token = token
     window.storage.setItem('manager/token', token)
+  },
+  clear () {
+    state.token = null
+    state.manager = {}
+    window.storage.removeItem('manager/manager')
+    window.storage.removeItem('manager/token')
+  }
+}
+
+const actions = {
+  logout ({commit}) {
+    commit('clear')
+    api.sysuser.logout()
   }
 }
 
 export default {
   namespaced: true,
   state,
-  mutations
+  mutations,
+  actions
 }

@@ -1,11 +1,20 @@
 <template>
   <div class="box">
     <div class="chart-timer" v-if="info.date">
-      {{info.date}}
+      {{info.time}}
     </div>
-    <div class="item" :class="info.type? info.type:'left'">
-      <el-image class="header-el-image" :src="info.headImg" />
-      <span class="message">{{info.message}}</span>
+    <div class="item">
+      <el-row>
+        <el-col v-if="info.isUser" :span="2" class="text-center">
+          <el-image class="header-el-image" :src="info.headImg"/>
+        </el-col>
+        <el-col :span="20" :push="(info.isUser?0:2)">
+          <div class="message">{{info.message}}</div>
+        </el-col>
+        <el-col v-if="info.isUser == false" :span="2" :push="2" class="text-center">
+          <el-image class="header-el-image" :src="info.headImg" />
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
@@ -22,76 +31,30 @@ export default {
 </script>
 
 <style scoped lang="less">
-  .item {
-    display: flex;
-    margin-bottom: 10px;
+  .box {
+    .item {
+      padding: 10px 0;
+      .header-el-image {
+        width: 42px;
+        height: 42px;
+        border-radius: 100px;
+      }
+
+      .message {
+        display: inline-block;
+        border-radius: 10px;
+        background: #b1e37c;
+        padding: 9px 10px;
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
+
+    .chart-timer{
+      text-align: center;
+      color: #616161;
+      font-size: 13px;
+    }
   }
 
-  .left {
-    flex-direction: row;
-  }
-
-  .right {
-    flex-direction: row-reverse;
-  }
-
-  .right .message {
-    margin-right: 10px;
-  }
-  .left .message{
-    margin-left: 10px;
-    background-color: white;
-  }
-
-  .header-el-image {
-    width: 42px;
-    height: 42px;
-    border-radius: 100px;
-  }
-
-  .message {
-    border-radius: 10px;
-    display: flex;
-    background: #b1e37c;
-    min-height: 25px;
-    padding: 9px 10px;
-    align-items: center;
-    font-size: 14px;
-    font-weight: normal;
-  }
-
-  .input-box {
-    position: absolute;
-    bottom: 0px;
-    left: 0;
-    right: 0;
-    display: flex;
-    padding: 4px 6px;
-    box-sizing: border-box;
-  }
-
-  .input-box input {
-    flex: 1;
-    border-radius: 10px;
-    border: 1px #cecece solid;
-    padding: 3px 4px;
-    outline: none;
-  }
-
-  .input-box button {
-    width: 80px;
-    background: #2196F4;
-    border-radius: 21px;
-    border: 1px #fffa solid;
-    color: #ffffff;
-    margin: 0px 6px;
-    outline: none;
-  }
-  button:active{}
-
-  .chart-timer{
-    text-align: center;
-    color: #616161;
-    font-size: 13px;
-  }
 </style>

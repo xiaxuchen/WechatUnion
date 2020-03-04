@@ -20,6 +20,8 @@ export default {
   },
   data () {
     return {
+      curPage: 0,
+      pageSize: 10,
       visible: false,
       loading: false,
       materialList: []
@@ -41,7 +43,7 @@ export default {
      */
     loadMaterialList () {
       this.loading = true
-      this.api.push.getMaterialList().then(this.api.commonResp((success, data) => {
+      this.api.push.getMaterialList(this.curPage, this.pageSize).then(this.api.commonResp((success, data) => {
         if (success) {
           this.materialList = data
           console.log(JSON.stringify(data))

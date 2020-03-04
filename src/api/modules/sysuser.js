@@ -18,29 +18,25 @@ export default {
    * @param url 页面路径
    */
   verifyPermit (path) {
-    return http.get('/sysuser/permission', {
+    return http.get('/sysuser/permit', {
       path
     })
   },
   /**
-   * 分页获取系统用户列表,TODO 后缀路径需要删除
+   * 分页获取系统用户列表,
    * @param curPage 当前页
    * @param pageSize 每页大小
    */
   getSysUserList (query) {
-    return http.get('/sysusers/list', {
-      query: JSON.stringify(query)
-    })
+    return http.get('/sysuser/list', query)
   },
   /**
-   * 删除系统用户 TODO 后缀路径需要删除
+   * 删除系统用户
    * @param ids 要删除的用户的id
    * @returns {*}
    */
-  deleteSysusers (ids) {
-    return http.del('/sysusers/delete', {
-      ids
-    })
+  deleteSysuser (id) {
+    return http.del(`/sysuser/${id}`)
   },
   /**
    * 获取系统中的角色列表 TODO 后缀路径需要删除
@@ -49,17 +45,33 @@ export default {
     return http.get('/roles/list')
   },
   /**
-   * 添加系统用户 TODO 需要把后缀去掉
+   * 添加系统用户
    * @param user 系统用户信息
    */
-  addSysuser (user) {
-    return http.post('/sysuser/add', {
-      user
+  addSysuser (user, headImg) {
+    return http.request({
+      url: '/sysuser',
+      method: 'post',
+      data: user,
+      headers: { 'Content-Type': 'application/json;charset=utf8' }
     })
   },
   updateUser (user) {
-    return http.put('/sysuser/update', {}, {
-      data: JSON.stringify(user)
+    return http.request({
+      url: '/sysuser',
+      method: 'put',
+      data: user,
+      headers: { 'Content-Type': 'application/json;charset=utf8' }
+    }
+    )
+  },
+  /**
+   * 退出登录
+   */
+  logout () {
+    return http.request({
+      url: '/sysuser/logout',
+      method: 'post'
     })
   }
 }

@@ -1,5 +1,5 @@
 const state = {
-  curChatUser: {}
+  curChatUser: null
 }
 
 const mutations = {

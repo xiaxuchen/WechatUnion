@@ -1,6 +1,6 @@
 <template>
     <div class="material-item">
-      <h1>更新于 {{material.updateTime}}</h1>
+      <div class="padding-md font-sm">更新于 {{material.updateTime}}</div>
       <div class="divider"></div>
       <el-image :src="material.pic" fit="fill" class="image"></el-image>
       <div class="title">{{material.title}}</div>
@@ -47,6 +47,10 @@ export default {
     .title {
       margin: 10px 20px;
       color: #000;
+      width: calc(100% - 20px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space : nowrap
     }
     &:hover>.cover{
       visibility: visible;

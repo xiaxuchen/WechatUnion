@@ -1,8 +1,8 @@
 export default (function (window) {
   let storage = {}
 
-  // 是否支持localStorage
-  if (!window.localStorage) {
+  // 是否支持sessionStorage
+  if (!window.sessionStorage) {
     storage.support = false
   } else {
     storage.support = true
@@ -30,7 +30,7 @@ export default (function (window) {
         value: JSON.stringify(value),
         time: time
       }
-      localStorage.setItem(key, JSON.stringify(setValue))
+      sessionStorage.setItem(key, JSON.stringify(setValue))
     } else {
       storage.setCookie(key, value, time)
     }
@@ -39,12 +39,12 @@ export default (function (window) {
   // 不存在的值会返回null
   storage.getItem = function (key) {
     if (this.support) {
-      let getValue = JSON.parse(localStorage.getItem(key))
+      let getValue = JSON.parse(sessionStorage.getItem(key))
       if (!getValue) {
         return null
       }
       if (getValue.time && getValue.time < (new Date()).getTime()) {
-        localStorage.removeItem(key)
+        sessionStorage.removeItem(key)
         return null
       } else if (getValue.value) {
         return JSON.parse(getValue.value)
@@ -59,7 +59,7 @@ export default (function (window) {
   // 移除某个值
   storage.removeItem = function (key) {
     if (this.support) {
-      localStorage.removeItem(key)
+      sessionStorage.removeItem(key)
     } else {
       storage.removeCookie(key)
     }
@@ -67,7 +67,7 @@ export default (function (window) {
   // 清空存储
   storage.clear = function () {
     if (this.support) {
-      localStorage.clear()
+      sessionStorage.clear()
     } else {
       storage.clearCookie()
     }

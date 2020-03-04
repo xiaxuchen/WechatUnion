@@ -2,7 +2,8 @@
     <div v-if="refresh">
       <el-row>
         <el-col>
-          <push-info @send-push="onSendPush"/>
+          <push-info @send-push="onSendPush"
+          />
         </el-col>
       </el-row>
       <el-row>

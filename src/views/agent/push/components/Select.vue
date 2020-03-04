@@ -72,9 +72,6 @@ export default {
     })
   },
   methods: {
-    nextStep () {
-      this.$router.push({name: 'pushInfo'})
-    },
     resetSearch () {
       this.phones = ''
       this.tagSelected = [0]
