@@ -1,56 +1,47 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import ElementUI from 'element-ui'
+import api from '@/api'
 import routes from './routes'
-import Frame from '@/Frame'
+import router from './router'
 
-Vue.use(Router)
-
-export default new Router({
-  mode: 'history',
-  routes: [
-    ...routes,
-    {
-      path: '/',
-      name: 'frame',
-      component: Frame,
-      children: [
-        {
-          path: 'index',
-          name: 'index',
-          component: () => import('@/views/agent/index'),
-          meta: {
-            title: '系统首页',
-            index: '/index'
-          }
-        },
-        {
-          path: 'push',
-          name: 'push',
-          component: () => import('@/views/agent/push'),
-          meta: {
-            title: '用户推送',
-            index: '/push'
-          }
-        },
-        {
-          path: 'clientServe',
-          name: 'clientServe',
-          component: () => import('@/views/agent/clientServe'),
-          meta: {
-            title: '用户接入',
-            index: '/clientServe'
-          }
-        },
-        {
-          path: 'sysUser',
-          name: 'sysUser',
-          component: () => import('@/views/admin/sysUser'),
-          meta: {
-            title: '用户管理',
-            index: '/sysUser'
-          }
-        }
-      ]
-    }
-  ]
+// 无需权限的页面
+const freePath = routes.map(route => {
+  return route.path
 })
+
+// 页面切换效果
+let loadingInstance = null
+router.beforeEach((to, from, next) => {
+  loadingInstance = ElementUI.Loading.service({
+    lock: true,
+    text: 'Loading',
+    spinner: 'el-icon-loading',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+  for (let i = 0; i < freePath.length; i++) {
+    if (to.path === freePath[i]) {
+      next()
+      return
+    }
+  }
+  // 请求权限验证
+  api.sysuser.verifyPermit(to.path)
+    .then(api.commonResp((success) => {
+      if (success) {
+        next()
+      } else {
+        router.push({name: '403'})
+      }
+    })).catch((e) => {
+      router.push({name: '403'})
+      this.$message.error(e)
+      loadingInstance.close()
+    })
+})
+
+router.afterEach(() => {
+  if (loadingInstance) {
+    loadingInstance.close()
+  }
+})
+
+export default router

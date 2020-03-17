@@ -1,4 +1,4 @@
-import http from '@/api/axios'
+import http from '../http'
 
 export default {
   /**
@@ -14,10 +14,8 @@ export default {
         users: users,
         ...pushInfo
       },
-      header: {
-        'Content-Type': 'application/json;charset=utf8' // 如果写成contentType会报错
-      },
-      method: 'post'
+      method: 'post',
+      isJson: true
     })
   },
   /**
@@ -32,6 +30,7 @@ export default {
    * @param tagList 标签列表
    * @param curPage 当前页，从1开始
    * @param pageSize 页面大小
+   * @param phone 用户电话号码
    * @returns {*}
    */
   loadUserList (tagList, curPage, pageSize, phone) {

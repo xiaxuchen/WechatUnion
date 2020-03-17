@@ -14,7 +14,6 @@ import 'font-awesome/css/font-awesome.min.css'
 import Common from '@/common/common'
 import VeLine from 'v-charts/lib/line.common'
 import 'animate.css'
-import routes from '@/router/routes'
 import filters from '@/filter'
 
 require('promise.prototype.finally').shim()
@@ -32,50 +31,9 @@ Vue.prototype.$bus = new Vue()
 Vue.use(ElementUI)
 Vue.use(Common)
 
-// 页面切换效果
-let loadingInstance = null
-
+// 初始化filter
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
-})
-
-// 无需权限的页面
-const freePath = routes.map(route => {
-  return route.path
-})
-
-router.beforeEach((to, from, next) => {
-  loadingInstance = ElementUI.Loading.service({
-    lock: true,
-    text: 'Loading',
-    spinner: 'el-icon-loading',
-    background: 'rgba(0, 0, 0, 0.7)'
-  })
-  for (let i = 0; i < freePath.length; i++) {
-    if (to.path === freePath[i]) {
-      next()
-      return
-    }
-  }
-  // 请求权限验证
-  api.sysuser.verifyPermit(to.path)
-    .then(api.commonResp((success) => {
-      if (success) {
-        next()
-      } else {
-        router.push({name: '403'})
-      }
-    })).catch((e) => {
-      router.push({name: '403'})
-      this.$message.error(e)
-      loadingInstance.close()
-    })
-})
-
-router.afterEach(() => {
-  if (loadingInstance) {
-    loadingInstance.close()
-  }
 })
 
 /* eslint-disable no-new */

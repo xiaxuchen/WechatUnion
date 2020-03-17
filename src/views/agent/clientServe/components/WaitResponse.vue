@@ -2,21 +2,21 @@
     <el-container class="wait-response">
       <el-aside class="aside">
         <div :style="{height:height - 140 + 'px'}" class="user-list">
-          <p v-if="chatUserList.length == 0" class="text-center font-sm text-info">当前暂未接入用户</p>
+          <p v-if="chatUserList.length === 0" class="text-center font-sm text-info">当前暂未接入用户</p>
           <user-item @click.native="toggleChatUser(user)" :user-info="user" v-for="user in chatUserList" :key="user.id" :active="chatUser != null && chatUser.id === user.id"/>
         </div>
       </el-aside>
       <el-main class="content" :style="{height:height - 140 + 'px'}">
         <!--当前没有正在聊天的用户-->
         <div class="wait-chat text-center text-info" v-if="chatUser == null">
-          <div><q class="el-icon-message" style="font-size: 40px" /></div>
+          <div><q class="el-icon-message" style="font-size: 40px" ></q></div>
           <div>未选择聊天</div>
         </div>
         <div class="chat-view" v-else>
           <message-header />
           <div :style="{height:height - 400 + 'px'}" ref="chatListWrap" class="message-list">
             <div class="text-center" style="padding-bottom: 20px" v-show="loadingMessage">
-              <q class="el-icon-loading" />
+              <q class="el-icon-loading" ></q>
             </div>
             <div class="text-center text-brand font-sm cursor-pointer" v-show="!loadingMessage">
               查看更多
@@ -36,21 +36,22 @@ import MessageHeader from './MessageHeader'
 import ChatInput from './ChatInput'
 export default {
   mounted () {
-    this.api.message.getChatUserList()
-      .then(this.api.commonResp((success, data) => {
-        this.updateUserList(data)
-      }, this))
-    setInterval(() => {
-      let requestTime = new Date().getTime()
-      // 轮询服务器，获取最新的消息和用户列表
-      this.api.message.refreshServe()
-        .then(this.api.commonResp((success, data) => {
-          if (requestTime > this.lastRequestTime) {
-            this.updateUserList(data.userList)
-            this.updateMessageList(data.messageList)
-          }
-        }, this))
-    }, 2000)
+    // 断开某用户
+    this.$bus.$on('session-disconnect', (openId) => {
+      this.api.message.disConnectUser(openId).commonThen((success) => {
+        if (success) {
+          let index = this.userMap[`user${openId}`]
+          delete this.userMap[`user${openId}`]
+          this.chatUserList.splice(index, 1)
+          this.$store.commit('message/setCurChatUser', null)
+        }
+      }, this)
+    })
+    // 更新聊天列表
+    this.getChatUserList()
+    this.$bus.$on('send-message', (type, content, openId) => {
+      this.sendMessageToUser(type, content, openId)
+    })
   },
   data () {
     return {
@@ -66,6 +67,7 @@ export default {
     }
   },
   computed: {
+    // 当前聊天的用户
     chatUser () {
       return this.$store.state.message.curChatUser
     },
@@ -74,6 +76,21 @@ export default {
     }
   },
   methods: {
+    // 获取当前聊天的所有用户信息，并且再结束后会延迟3000ms再次获取
+    getChatUserList () {
+      this.api.message.getChatUserList()
+        .then(this.api.commonResp((success, data) => {
+          this.updateUserList(data)
+          this.$store.commit('message/setRespondCount', data.filter(user => {
+            return user.notRead > 0
+          }).length)
+        }, this)).finally(() => {
+          setTimeout(() => {
+            this.getChatUserList()
+          }, 3000)
+        })
+    },
+    // 更新用户列表的数据(主要是更新用户的未读消息和最后一条消息)
     updateUserList (userList) {
       userList.forEach((user) => {
         let index = this.userMap[`user${user.id}`]
@@ -82,26 +99,39 @@ export default {
           this.chatUserList.push(user)
           // userMap记录其所在的位置
           this.userMap[`user${user.id}`] = this.chatUserList.length - 1
-          console.log('添加', this.chatUserList.length - 1, user.id)
         } else {
           // 存在则更新
           this.chatUserList.splice(index, 1, user)
-          // console.log('更新', index, user.id)
+        }
+        if (!this.loadingMessage && this.chatUser && user.id === this.chatUser.id && user.notRead > 0) {
+          this.loadMessage()
         }
       })
     },
-    updateMessageList (messageList) {
-      messageList.forEach((message) => {
-        if (this.userChatMap[`user${message.userId}`] != null) {
-          this.userChatMap[`user${message.userId}`].push(message)
-        }
-      })
+    // 更新消息
+    updateMessages (messageList, userId) {
+      // 将新消息同步到map
+      let messages = this.userChatMap[`user${this.chatUser.id}`]
+      if (messages) {
+        // 如果列表已存在就添加进去
+        messageList.forEach((message) => {
+          this.chatInfoList.push(message)
+        })
+      } else {
+        messages = messageList
+      }
+      // 重新放回map中
+      this.userChatMap[`user${this.chatUser.id}`] = messages
+      // 如果还是这个用户的话才设置进消息列表
+      if (userId === this.chatUser.id) {
+        this.chatInfoList = messages
+      }
     },
     // 切换当前的聊天用户
     toggleChatUser (user) {
-      console.log(user)
       // 设置当前聊天的用户
       this.$store.commit('message/setCurChatUser', user)
+      this.chatInfoList = this.userChatMap[`user${user.id}`]
       let messageList = this.userChatMap[`user${user.id}`]
       if (messageList != null) {
         this.chatInfoList = messageList
@@ -110,21 +140,74 @@ export default {
           let chatListWrap = this.$refs.chatListWrap
           chatListWrap.scrollTop = chatListWrap.scrollHeight
         })
-      } else {
-        this.loadingMessage = true
-        this.chatInfoList = []
-        this.api.message.getChatMessageList(user.id)
-          .then(this.api.commonResp((success, data) => {
-            this.chatInfoList = data
-            this.userChatMap[`user${user.id}`] = data
-          }, this)).finally(() => {
-            this.loadingMessage = false
-            this.$nextTick(() => {
-              let chatListWrap = this.$refs.chatListWrap
-              chatListWrap.scrollTop = chatListWrap.scrollHeight
-            })
-          })
       }
+      this.loadMessage()
+    },
+    /**
+     * 将消息设为已读
+     * */
+    messageRead (ids, userId) {
+      this.api.message.setMessagesRead(ids, userId)
+        .finally(() => {
+          this.loadingMessage = false
+        })
+    },
+    /**
+     * 加载消息
+     */
+    loadMessage () {
+      this.loadingMessage = true
+      // 获取最后一个消息的id
+      let lastId = null
+      if (this.chatInfoList && this.chatInfoList.length > 0) {
+        lastId = this.chatInfoList[this.chatInfoList.length - 1].id
+      }
+      let userId = this.chatUser.id
+      this.api.message.getChatMessageList(userId, lastId)
+        .then(this.api.commonResp((success, data) => {
+          if (success) {
+            // 更新消息
+            this.updateMessages(data, userId)
+            let ids = data.map((msg) => {
+              return msg.id
+            })
+            // 将加载下来的消息设置为已读
+            if (ids && ids.length > 0) {
+              this.messageRead(ids, userId)
+            } else {
+              this.loadingMessage = false
+            }
+          } else {
+            this.loadingMessage = false
+          }
+        }, this)).catch(() => {
+          this.loadingMessage = false
+        }).finally(() => {
+          this.$nextTick(() => {
+            let chatListWrap = this.$refs.chatListWrap
+            chatListWrap.scrollTop = chatListWrap.scrollHeight
+          })
+        })
+    },
+    /**
+     * 发送消息给当前聊天用户
+     * @param type 消息类型
+     * @param message 消息内容
+     * @param openId 用户id
+     */
+    sendMessageToUser (type, message, openId) {
+      let m = {
+        isUser: false,
+        time: null,
+        message,
+        userId: openId
+      }
+      this.api.message.sendMessage(type, message, openId)
+        .commonThen((success, data) => {
+          m.id = data.data
+          // 发送成功后显示
+          this.updateMessages([m])
+        }, this)
     }
   },
   components: {

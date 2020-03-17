@@ -6,12 +6,12 @@
         </el-col>
         <el-col :span="1" :push="20">
           <el-tooltip effect="dark" content="转接" placement="bottom" class="icon-button">
-            <q class="el-icon-refresh" />
+            <q class="el-icon-refresh" ></q>
           </el-tooltip>
         </el-col>
         <el-col :span="1" :push="20">
           <el-tooltip effect="dark" content="关闭会话" placement="bottom" class="icon-button">
-            <q class="el-icon-remove-outline"></q>
+            <q class="el-icon-remove-outline" @click="$bus.$emit('session-disconnect', chatUser.id)"></q>
           </el-tooltip>
         </el-col>
       </el-row>

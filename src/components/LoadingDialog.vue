@@ -19,18 +19,18 @@ export default {
   components: {
     BottomButtonDialog
   },
-  data () {
-    return {
-      visible: false
+  computed: {
+    visible () {
+      return this.$store.state.system.loading
     }
   },
   mounted () {
     this.$bus.$on('show-loading-dialog', () => {
-      this.visible = true
+      this.$store.commit('system/toggleLoading', true)
     })
 
     this.$bus.$on('hide-loading-dialog', () => {
-      this.visible = false
+      this.$store.commit('system/toggleLoading', false)
     })
   }
 }

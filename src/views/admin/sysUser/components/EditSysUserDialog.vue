@@ -111,9 +111,10 @@ export default {
   },
   methods: {
     onImageChange (url) {
-      this.editForm = Object.assign({
+      console.log(url)
+      this.editForm = Object.assign({}, this.editForm, {
         headImg: url
-      }, this.editForm)
+      })
     },
     saveUser () {
       this.$refs.editForm.validate((valid) => {

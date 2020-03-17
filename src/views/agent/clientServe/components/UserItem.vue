@@ -10,7 +10,7 @@
                 {{userInfo.name}}
               </el-col>
               <el-col class="tel" :span="12">
-                {{userInfo.phone}}
+                {{userInfo.phone?(userInfo.phone):'未绑定'}}
               </el-col>
               <el-col :span="2">
                 <el-badge :value="userInfo.notRead" v-show="userInfo.notRead > 0" class="item" />
@@ -18,7 +18,7 @@
             </el-row>
             <el-row style="margin-top: 5px">
               <el-col :span="12" class="last-info">
-                  {{userInfo.lastMessage}}
+                <message-shower :message="userInfo.lastMessage" />
               </el-col>
               <el-col :span="10" class="state">
                 {{userInfo.lastTime}}
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import MessageShower from '@/components/MessageShower'
 export default {
   props: {
     userInfo: {
@@ -41,6 +42,14 @@ export default {
       required: false,
       default: false
     }
+  },
+  computed: {
+    curChatUser () {
+      return this.$store.state.message.curChatUser
+    }
+  },
+  components: {
+    MessageShower
   }
 }
 </script>

@@ -1,17 +1,27 @@
 <template>
     <div class="user-list" :style="{height:height - 220 + 'px'}">
       <el-table :show-header="false"
-        :data="userMessageData"
+        :data="userData.userList"
       empty-text="暂无消息">
-        <el-table-column type="selection" v-if="selectable"/>
+        <el-table-column type="selection" v-if="selectable">
+          <template slot-scope="scope">
+            <el-checkbox
+              @change="handleSelectionChange(scope.row)"
+              v-model="scope.row.checked"
+            />
+          </template>
+        </el-table-column>
         <el-table-column prop="headImg">
           <template slot-scope="{row,$index}">
             <el-image :src="row.headImg" style="width: 50px; height: 50px"></el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="nickname">
+        <el-table-column prop="name">
         </el-table-column>
-        <el-table-column prop="message">
+        <el-table-column prop="lastMessage">
+          <slot slot-scope="{row}">
+            <span class="single-line">{{row.lastMessage?row.lastMessage.message:''}}</span>
+          </slot>
         </el-table-column>
         <el-table-column prop="phone">
         </el-table-column>
@@ -21,10 +31,12 @@
       </el-table>
       <el-pagination
         style="margin-top: 10px"
-        layout="prev, pager, next, jumper"
-        :total="total"
-        :page-size="5"
-        v-show="total > 5"
+        layout="prev, pager, next, jumper,total"
+        :total="userData.total"
+        :current-page="userData.curPage"
+        @change="pageChange"
+        :page-size="10"
+        v-show="userData.total > 10"
       />
     </div>
 </template>
@@ -36,62 +48,38 @@ export default {
     selectable: {
       type: Boolean,
       default: true
-    }
+    },
+    userData: Object
   },
   data () {
     return {
-      total: 6,
-      userMessageData: [{
-        headImg: 'https://timgsa.baidu.com/timg?image&amp;amp;amp;amp;amp;amp;quality=80&amp;amp;amp;amp;amp;amp;size=b9999_10000&amp;amp;amp;amp;amp;amp;sec=1579165101420&amp;amp;amp;amp;amp;amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;amp;amp;amp;amp;amp;imgtype=jpg&amp;amp;amp;amp;amp;amp;src=http%3A%2F%2Fimg2.touxiang.cn%2Ffile%2F20171113%2Fb213c1ac58be0e02906ea1424781b31b.jpg',
-        nickname: '嘿',
-        time: '2018-10-11 08:10',
-        message: '你好啊',
-        phone: '17779911413',
-        agent: {
-          id: 1000,
-          name: 'xxc'
+      selectMap: {}
+    }
+  },
+  mounted () {
+
+  },
+  methods: {
+    // 更新父组件绑定的当前页userData.curPage
+    pageChange (page) {
+      this.$emit('update:userData.curPage', page)
+    },
+    // 选择变化的时候将当前选中的传递出去
+    handleSelectionChange (row) {
+      if (this.selectable) {
+        this.selectMap[`user${row.userId}`] = row
+        this.$emit('select', this.selectMap)
+      }
+    }
+  },
+  watch: {
+    // 更新选中状态
+    userData (newValue) {
+      newValue.userList.forEach(value => {
+        if (this.selectMap[`user${value.userId}`]) {
+          value.checked = true
         }
-      }, {
-        headImg: 'https://timgsa.baidu.com/timg?image&amp;amp;amp;amp;amp;amp;quality=80&amp;amp;amp;amp;amp;amp;size=b9999_10000&amp;amp;amp;amp;amp;amp;sec=1579165101420&amp;amp;amp;amp;amp;amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;amp;amp;amp;amp;amp;imgtype=jpg&amp;amp;amp;amp;amp;amp;src=http%3A%2F%2Fimg2.touxiang.cn%2Ffile%2F20171113%2Fb213c1ac58be0e02906ea1424781b31b.jpg',
-        nickname: '嘿',
-        time: '2018-10-11 08:10',
-        message: '你好啊',
-        phone: '17779911413',
-        agent: {
-          id: 1000,
-          name: 'xxc'
-        }
-      }, {
-        headImg: 'https://timgsa.baidu.com/timg?image&amp;amp;amp;amp;amp;amp;quality=80&amp;amp;amp;amp;amp;amp;size=b9999_10000&amp;amp;amp;amp;amp;amp;sec=1579165101420&amp;amp;amp;amp;amp;amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;amp;amp;amp;amp;amp;imgtype=jpg&amp;amp;amp;amp;amp;amp;src=http%3A%2F%2Fimg2.touxiang.cn%2Ffile%2F20171113%2Fb213c1ac58be0e02906ea1424781b31b.jpg',
-        nickname: '嘿',
-        time: '2018-10-11 08:10',
-        message: '你好啊',
-        phone: '17779911413',
-        agent: {
-          id: 1000,
-          name: 'xxc'
-        }
-      }, {
-        headImg: 'https://timgsa.baidu.com/timg?image&amp;amp;amp;amp;amp;amp;quality=80&amp;amp;amp;amp;amp;amp;size=b9999_10000&amp;amp;amp;amp;amp;amp;sec=1579165101420&amp;amp;amp;amp;amp;amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;amp;amp;amp;amp;amp;imgtype=jpg&amp;amp;amp;amp;amp;amp;src=http%3A%2F%2Fimg2.touxiang.cn%2Ffile%2F20171113%2Fb213c1ac58be0e02906ea1424781b31b.jpg',
-        nickname: '嘿',
-        time: '2018-10-11 08:10',
-        message: '你好啊',
-        phone: '17779911413',
-        agent: {
-          id: 1000,
-          name: 'xxc'
-        }
-      }, {
-        headImg: 'https://timgsa.baidu.com/timg?image&amp;amp;amp;amp;amp;amp;quality=80&amp;amp;amp;amp;amp;amp;size=b9999_10000&amp;amp;amp;amp;amp;amp;sec=1579165101420&amp;amp;amp;amp;amp;amp;di=15b492e796aaf49d330fc00929bf4e7b&amp;amp;amp;amp;amp;amp;imgtype=jpg&amp;amp;amp;amp;amp;amp;src=http%3A%2F%2Fimg2.touxiang.cn%2Ffile%2F20171113%2Fb213c1ac58be0e02906ea1424781b31b.jpg',
-        nickname: '嘿',
-        time: '2018-10-11 08:10',
-        message: '你好啊',
-        phone: '17779911413',
-        agent: {
-          id: 1000,
-          name: 'xxc'
-        }
-      }]
+      })
     }
   }
 }

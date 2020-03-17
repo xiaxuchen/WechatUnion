@@ -5,7 +5,7 @@
       <el-image :src="material.pic" fit="fill" class="image"></el-image>
       <div class="title">{{material.title}}</div>
       <div class="cover full clearfix" @click="$emit('select')">
-        <b class="el-icon-check"></b>
+        <b class="el-icon-check" ></b>
       </div>
     </div>
 </template>

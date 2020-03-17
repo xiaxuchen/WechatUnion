@@ -3,12 +3,12 @@
     <el-row>
       <el-col :span="3">
         <div  @click="toggleTab(0)"  class="tab" :class="{active:curTab === 0}">
-          <i class="el-icon-chat-line-round" /> 0人待回复
+          <i class="el-icon-chat-line-round" ></i> {{respondCount}}人待回复
         </div>
       </el-col>
       <el-col :span="3">
         <div  @click="toggleTab(1)"  class="tab" :class="{active:curTab === 1}">
-          <i class="el-icon-time" /> 0人待接入
+          <i class="el-icon-time" ></i> {{waitCount}}人待接入
         </div>
       </el-col>
       <el-col :span="2" :push="15">
@@ -16,7 +16,7 @@
       </el-col>
       <el-col :span="2" :push="15">
         <div class="setting" @click="toggleTab(2)" :class="{active:curTab === 2}">
-          <q class="el-icon-s-tools" />
+          <q class="el-icon-s-tools" ></q>
         </div>
       </el-col>
     </el-row>
@@ -25,6 +25,8 @@
 
 <script>
 import AgentInfo from './AgentInfo'
+import {mapState} from 'vuex'
+
 export default {
   data () {
     return {
@@ -34,6 +36,11 @@ export default {
         isOnline: true
       }
     }
+  },
+  computed: {
+    ...mapState({
+      waitCount: state => state.message.waitCount,
+      respondCount: state => state.message.respondCount})
   },
   components: {
     AgentInfo

@@ -1,10 +1,14 @@
 const state = {
-  availableHeight: 0
+  availableHeight: 0,
+  loading: false
 }
 
 const mutations = {
   setAvailableHeight (state, height) {
     state.availableHeight = height
+  },
+  toggleLoading (state, loading) {
+    state.loading = loading
   }
 }
 

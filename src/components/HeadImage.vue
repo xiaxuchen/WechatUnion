@@ -23,6 +23,7 @@ export default {
       if (this.url.startsWith('http')) {
         return this.url
       }
+      // code
       return this.api.baseURL + '/resource/file/' + this.url
     }
   }

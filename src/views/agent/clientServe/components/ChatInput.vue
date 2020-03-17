@@ -24,7 +24,7 @@
       </el-row>
       <el-row style="margin-top: 10px">
         <el-col>
-          <el-input type="textarea" @keyup.enter.native="sendMessage" v-model="textMessage" size="medium" resize="none" class="transparent text-message-input" />
+          <el-input type="textarea" @keyup.enter.native="sendTextMessage()" v-model="textMessage" size="medium" resize="none" class="transparent text-message-input" />
         </el-col>
       </el-row>
       <el-row style="margin-top: 10px">
@@ -37,6 +37,10 @@
 
 <script>
 import Emotion from '@/components/Emotion'
+const messageType = {
+  text: 0,
+  image: 1
+}
 export default {
   data () {
     return {
@@ -46,9 +50,14 @@ export default {
   components: {
     Emotion
   },
+  computed: {
+    curChatUser () {
+      return this.$store.state.message.curChatUser
+    }
+  },
   methods: {
-    sendMessage () {
-      this.$bus.$emit('send-message', this.textMessage)
+    sendTextMessage () {
+      this.$bus.$emit('send-message', messageType.text, this.textMessage, this.curChatUser.id)
       this.textMessage = ''
     }
   }

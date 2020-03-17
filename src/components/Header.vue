@@ -27,7 +27,7 @@
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{userInfo.username}} <i class="el-icon-caret-bottom" />
+                      {{userInfo.username}} <i class="el-icon-caret-bottom" ></i>
                     </span>
 
                     <el-dropdown-menu slot="dropdown">
@@ -59,8 +59,10 @@ export default {
     handleCommand (command) {
       if (command === 'logout') {
         this.$bus.$emit('show-loading-dialog')
-        this.$store.dispatch('manager/logout').then(value => {
-          this.$router.push('/login')
+        this.$store.dispatch('manager/logout').then(() => {
+          this.$router.push('/login').then(() => {
+            location.reload()
+          })
         }).catch(reason => {
           this.$message.error(reason)
         }).finally(() => {

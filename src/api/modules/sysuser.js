@@ -1,4 +1,4 @@
-import http from '@/api/axios'
+import http from '../http'
 
 export default {
   /**
@@ -15,24 +15,23 @@ export default {
   },
   /**
    * 验证是否有权限进入url
-   * @param url 页面路径
+   * @param path 页面路径
    */
   verifyPermit (path) {
     return http.get('/sysuser/permit', {
-      path
+      url: path
     })
   },
   /**
    * 分页获取系统用户列表,
-   * @param curPage 当前页
-   * @param pageSize 每页大小
+   * @param query 查询参数
    */
   getSysUserList (query) {
     return http.get('/sysuser/list', query)
   },
   /**
    * 删除系统用户
-   * @param ids 要删除的用户的id
+   * @param id 要删除的用户的id
    * @returns {*}
    */
   deleteSysuser (id) {
@@ -42,18 +41,18 @@ export default {
    * 获取系统中的角色列表 TODO 后缀路径需要删除
    */
   getSysRoles () {
-    return http.get('/roles/list')
+    return http.get('/sysuser/roles')
   },
   /**
    * 添加系统用户
    * @param user 系统用户信息
    */
-  addSysuser (user, headImg) {
+  addSysuser (user) {
     return http.request({
       url: '/sysuser',
       method: 'post',
       data: user,
-      headers: { 'Content-Type': 'application/json;charset=utf8' }
+      isJson: true
     })
   },
   updateUser (user) {
@@ -61,7 +60,7 @@ export default {
       url: '/sysuser',
       method: 'put',
       data: user,
-      headers: { 'Content-Type': 'application/json;charset=utf8' }
+      isJson: true
     }
     )
   },
