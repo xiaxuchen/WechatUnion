@@ -62,6 +62,10 @@ export default {
             {
               path: '/sysUser',
               title: '用户管理'
+            },
+            {
+              path: '/relation',
+              title: '关系管理'
             }
           ]
         }

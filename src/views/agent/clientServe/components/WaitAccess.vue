@@ -7,7 +7,8 @@
               <el-input placeholder="搜索" prefix-icon="el-icon-search" size="mini"/>
             </el-col>
             <el-col :span="6" :push="8">
-              <el-select size="mini" style="margin-right: 20px"></el-select>
+              <!--TODO 不知道这个v-model和value会不会冲突-->
+              <el-select size="mini" style="margin-right: 20px" v-model="tags" value="tags"></el-select>
             </el-col>
             <el-col :span="5" :push="8">
               <el-checkbox label="只看我的" style="margin-right: 20px" />
@@ -25,7 +26,8 @@
             <!--<user-list :height="height" :selectable="false"/>-->
           <!--</el-tab-pane>-->
           <el-tab-pane label="可回访" name="可回访">
-            <user-list :height="height"/>
+            <!--TODO 添加数据源-->
+            <user-list :height="height" :user-data="canConnectData"/>
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -69,8 +71,16 @@ export default {
   },
   data () {
     return {
+      tags: [],
       curTab: '待接入',
       waitData: {
+        curPage: 1,
+        total: 0,
+        userList: [],
+        selectMap: {}
+      },
+      // 可以连接的数据
+      canConnectData: {
         curPage: 1,
         total: 0,
         userList: [],

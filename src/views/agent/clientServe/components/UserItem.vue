@@ -18,7 +18,7 @@
             </el-row>
             <el-row style="margin-top: 5px">
               <el-col :span="12" class="last-info">
-                <message-shower :message="userInfo.lastMessage" />
+                <message-shower :message="userInfo.lastMessage?userInfo.lastMessage:{}" />
               </el-col>
               <el-col :span="10" class="state">
                 {{userInfo.lastTime}}

@@ -81,8 +81,7 @@ export default {
    */
   setMessagesRead (messageIds, userId) {
     return http.put('/message/list/read', {
-      messageIds,
-      userId
+      messageIds
     })
   },
   /**
@@ -102,6 +101,16 @@ export default {
         userId
       },
       isJson: true
+    })
+  },
+  /**
+   * 获取消息id为firstId前的10条历史记录
+   * @param lastId 最开始的一条id
+   */
+  getHistoryMessages (userId, lastId) {
+    return http.get('/message/history/list', {
+      userId,
+      lastId
     })
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="chart-timer" v-if="info.date">
+    <div class="chart-timer" v-if="info.time">
       {{info.time}}
     </div>
     <div class="item">

@@ -23,7 +23,7 @@
                     <span class="btn-bell-badge" v-if="message"></span>
                 </div>
                 <!-- 用户头像 -->
-                <div class="user-avator"><head-image class="avator" :url="userInfo.headImg" :styles="{borderRadius: '100%',width: '40px',height: '40px'}" /></div>
+                <div class="user-avator" @click="toMineInfo"><head-image class="avator" :url="userInfo.headImg" :styles="{borderRadius: '100%',width: '40px',height: '40px'}" /></div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
@@ -60,9 +60,7 @@ export default {
       if (command === 'logout') {
         this.$bus.$emit('show-loading-dialog')
         this.$store.dispatch('manager/logout').then(() => {
-          this.$router.push('/login').then(() => {
-            location.reload()
-          })
+          location.pathname = this.$router.loginPath
         }).catch(reason => {
           this.$message.error(reason)
         }).finally(() => {
@@ -100,6 +98,12 @@ export default {
         }
       }
       this.fullScreen = !this.fullScreen
+    },
+    /**
+     * 跳转到我的消息页面
+     */
+    toMineInfo () {
+      this.$router.push({name: 'mine'})
     }
   }
 }
@@ -165,6 +169,7 @@ export default {
         margin-left: 10px;
     }
     .user-avator{
+      cursor: pointer;
       margin-left: 20px;
       .avator{
         width: 48px;

@@ -19,7 +19,7 @@
               <q class="el-icon-loading" ></q>
             </div>
             <div class="text-center text-brand font-sm cursor-pointer" v-show="!loadingMessage">
-              查看更多
+              <el-button type="text" @click="loadHistory" v-show="!chatUser.noMore">查看更多</el-button>
             </div>
             <chat-item v-for="(chatInfo,index) in chatInfoList" :key="index" :info="chatInfo" />
           </div>
@@ -103,7 +103,8 @@ export default {
           // 存在则更新
           this.chatUserList.splice(index, 1, user)
         }
-        if (!this.loadingMessage && this.chatUser && user.id === this.chatUser.id && user.notRead > 0) {
+        // 如果当前用户有未读消息，就自动加载
+        if (!this.loadingMessage && this.isCurUser(user.id) && user.notRead > 0) {
           this.loadMessage()
         }
       })
@@ -123,9 +124,15 @@ export default {
       // 重新放回map中
       this.userChatMap[`user${this.chatUser.id}`] = messages
       // 如果还是这个用户的话才设置进消息列表
-      if (userId === this.chatUser.id) {
+      if (this.isCurUser(userId)) {
+        console.log('123')
         this.chatInfoList = messages
       }
+      // 切换的时候将滚动条拖到底部
+      this.$nextTick(() => {
+        let chatListWrap = this.$refs.chatListWrap
+        chatListWrap.scrollTop = chatListWrap.scrollHeight
+      })
     },
     // 切换当前的聊天用户
     toggleChatUser (user) {
@@ -208,6 +215,59 @@ export default {
           // 发送成功后显示
           this.updateMessages([m])
         }, this)
+    },
+    /**
+     *  加载历史记录
+     */
+    loadHistory () {
+      let lastId = null
+      if (this.chatInfoList && this.chatInfoList.length > 0) {
+        lastId = this.chatInfoList[0].id
+      }
+      const userId = this.chatUser.id
+      this.api.message.getHistoryMessages(userId, lastId)
+        .commonThen((success, data) => {
+          // 如果没有消息
+          if (data.length === 0) {
+            const index = this.userMap[`user${userId}`]
+            console.log(index)
+            if (index === 0 || index) {
+              // 就给用户加上没有更多消息
+              this.chatUserList[index].noMore = true
+              console.log(this.chatUserList[index])
+              // 如果仍是当前用户，则更新到vuex
+              if (this.isCurUser(userId)) {
+                this.$store.commit('message/setCurChatUser', this.chatUserList[index])
+              }
+            }
+          }
+          let infoList = this.userChatMap[`user${userId}`]
+          if (!infoList) {
+            infoList = []
+          }
+          // 将信息放入开头
+          data.forEach((msg) => {
+            infoList.unshift(msg)
+          })
+          this.chatInfoList = infoList
+          // 将用户的消息放入用户的聊天的map
+          this.userChatMap[`user${userId}`] = infoList
+          // 如果还是当前用户，就更新到消息list中去
+          if (this.isCurUser(userId)) {
+            this.chatInfoList = infoList
+          }
+        })
+    },
+    /**
+     * 是否为当前用户
+     * @param userId 用户id
+     * @returns {boolean} 是否为当前用户
+     */
+    isCurUser (userId) {
+      if (userId && this.chatUser && this.chatUser.id === userId) {
+        return true
+      }
+      return false
     }
   },
   components: {

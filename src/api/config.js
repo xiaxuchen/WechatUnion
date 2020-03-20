@@ -31,7 +31,7 @@ instance.interceptors.request.use(
     if (!config.isJson &&
       (config.method === 'post' || config.method === 'put')) {
       // post、put请求时，序列化入参
-      config.data = QS.stringify(config.data)
+      config.data = QS.stringify(config.data, { arrayFormat: 'repeat' })
     }
     return config
   }, error => {
@@ -50,10 +50,7 @@ instance.interceptors.response.use(
     switch (code) {
       // 当用户未登录的时候导航到登录页面
       case 20001: {
-        router.push({name: 'login'})
-          .then(() => {
-            location.reload()
-          })
+        location.pathname = router.loginPath
         return Promise.reject(response.data.msg)
       }
     }

@@ -1,11 +1,14 @@
 import axios from './config'
+import qs from 'qs'
 
 function get (uri, params) {
   return axios.request({
     url: uri,
     method: 'get',
-    params: params
-  })
+    params: params,
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
+    }})
 }
 
 function post (uri, params) {
@@ -20,8 +23,10 @@ function del (uri, params) {
   return axios.request({
     url: uri,
     method: 'delete',
-    params: params
-  })
+    params: params,
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
+    }})
 }
 
 function put (uri, params) {

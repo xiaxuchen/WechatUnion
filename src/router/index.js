@@ -3,6 +3,9 @@ import api from '@/api'
 import routes from './routes'
 import router from './router'
 
+// TODO 这里为了调试进行了修改
+console.log(api)
+
 // 无需权限的页面
 const freePath = routes.map(route => {
   return route.path
@@ -23,19 +26,20 @@ router.beforeEach((to, from, next) => {
       return
     }
   }
+  next()
   // 请求权限验证
-  api.sysuser.verifyPermit(to.path)
-    .then(api.commonResp((success) => {
-      if (success) {
-        next()
-      } else {
-        router.push({name: '403'})
-      }
-    })).catch((e) => {
-      router.push({name: '403'})
-      this.$message.error(e)
-      loadingInstance.close()
-    })
+  // api.sysuser.verifyPermit(to.path)
+  //   .then(api.commonResp((success) => {
+  //     if (success) {
+  //       next()
+  //     } else {
+  //       router.push({name: '403'})
+  //     }
+  //   })).catch((e) => {
+  //     router.push({name: '403'})
+  //     this.$message.error(e)
+  //     loadingInstance.close()
+  //   })
 })
 
 router.afterEach(() => {

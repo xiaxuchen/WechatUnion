@@ -1,6 +1,6 @@
 <template>
     <div class="bottom-button-dialog">
-      <el-dialog :visible="visible" @close="hide" v-bind="$attrs">
+      <el-dialog :visible.sync="visible" @close="hide" v-bind="$attrs">
         <div slot="title" v-if="$slots.title != null">
           <slot name="title" />
         </div>

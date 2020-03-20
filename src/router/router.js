@@ -6,6 +6,7 @@ import Frame from '@/Frame'
 Vue.use(Router)
 
 export default new Router({
+  loginPath: '/',
   mode: 'history',
   routes: [
     ...routes,
@@ -48,6 +49,24 @@ export default new Router({
           meta: {
             title: '用户管理',
             index: '/sysUser'
+          }
+        },
+        {
+          path: 'mine',
+          name: 'mine',
+          component: () => import('@/views/user/mine'),
+          meta: {
+            title: '我的资料',
+            index: '/mine'
+          }
+        },
+        {
+          path: 'relation',
+          name: 'relation',
+          component: () => import('@/views/admin/relation'),
+          meta: {
+            title: '关系管理',
+            index: '/relation'
           }
         }
       ]
