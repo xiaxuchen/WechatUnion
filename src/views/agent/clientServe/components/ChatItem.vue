@@ -9,7 +9,7 @@
           <el-image class="header-el-image" :src="headImg"/>
         </el-col>
         <el-col :span="20" :push="(info.isUser?0:2)" :align="info.isUser?'left':'right'">
-          <div class="message">{{info.message}}</div>
+          <message-shower class="message" :message="info"></message-shower>
         </el-col>
         <el-col v-if="info.isUser === false" :span="2" :push="2" class="text-center">
           <head-image :styles="{ width: '42px', height: '42px', borderRadius: '100px'}" :url="$store.state.manager.manager.headImg" />
@@ -21,8 +21,9 @@
 
 <script>
 import HeadImage from '@/components/HeadImage'
+import MessageShower from '@/components/MessageShower'
 export default {
-  components: {HeadImage},
+  components: {MessageShower, HeadImage},
   props: {
     info: {
       type: Object,

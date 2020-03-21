@@ -1,6 +1,6 @@
 <template>
     <div class="panel-item">
-      <div class="count">{{count? count: ''}}</div>
+      <div class="count">{{count? count: '0'}}</div>
       <div class="text">{{text}}</div>
     </div>
 </template>

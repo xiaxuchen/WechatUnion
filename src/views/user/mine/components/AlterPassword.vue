@@ -1,6 +1,6 @@
 <template>
     <div>
-      <bottom-button-dialog title="修改密码" :visible.sync="localVisible" width="30%" confirm-button="修改" @on-confirm="AlterPassword">
+      <bottom-button-dialog title="修改密码" :visible.sync="localVisible" width="30%" confirm-button="修改" @on-confirm="alterPassword">
         <el-form :model="pwdObj" :rules="rules" label-width="80px" ref="pwdForm">
           <el-form-item label="原密码" prop="originPwd">
             <el-input type="password" v-model="pwdObj.originPwd"></el-input>
@@ -60,8 +60,8 @@ export default {
     }
   },
   methods: {
-    alterPassword (formName) {
-      this.$refs[formName].validate((valid) => {
+    alterPassword () {
+      this.$refs['pwdForm'].validate((valid) => {
         if (valid && this.pwdObj.newPwd === this.pwdObj.confirmPwd) {
           this.$emit('alter', this.pwdObj)
         } else {

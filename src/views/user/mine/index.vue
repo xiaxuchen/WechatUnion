@@ -38,8 +38,8 @@
             </el-form-item>
           </template>
           <el-form-item align="right">
-            <el-button >恢复</el-button>
-            <el-button type="primary">保存</el-button>
+            <el-button @click="reset">恢复</el-button>
+            <el-button type="primary" @click="saveUser">保存</el-button>
           </el-form-item>
         </el-form>
       </el-form>
@@ -57,27 +57,60 @@ export default {
   },
   data () {
     return {
-      userInfo: {
-        username: 'xxcisbest',
-        phone: '17779911413',
-        headImg: 'http://pic2.zhimg.com/50/v2-fb824dbb6578831f7b5d92accdae753a_hd.jpg',
-        isAgent: true,
-        name: '夏旭晨',
-        sex: 0,
-        des: '一个乐观向上的客服，最大的愿望就是世界和平'
-      },
+      userInfo: {},
       alterVisible: false
     }
   },
+  computed: {
+    mineInfo () {
+      return this.$store.state.manager.manager
+    }
+  },
+  watch: {
+    mineInfo: {
+      handler (newValue) {
+        this.userInfo = {...newValue}
+      },
+      immediate: true
+    }
+  },
   methods: {
-    onImageChange () {
-
+    onImageChange (img) {
+      this.userInfo.headImg = img
     },
     showAlterPwd () {
       this.alterVisible = true
     },
     alterPwd (pwdObj) {
-      console.log(pwdObj)
+      this.api.sysuser.alterPwd(pwdObj.originPwd, pwdObj.newPwd)
+        .commonThen((success, data) => {
+          if (success && data) {
+            this.$message('密码修改成功')
+            this.alterVisible = false
+          }
+        }, this)
+    },
+    // 重置
+    reset () {
+      this.userInfo = this.mineInfo
+    },
+    saveUser () {
+      const userInfo = this.userInfo
+      if (userInfo.isAgent) {
+        if (!userInfo.name) {
+          this.$message.error('客户经理的名字不能为空')
+          return
+        }
+      }
+      this.api.sysuser.updateUser({
+        userId: userInfo.id,
+        ...userInfo,
+        isInValid: false
+      }).commonThen((success) => {
+        if (success) {
+          this.$message('保存成功')
+        }
+      }, this)
     }
   }
 }

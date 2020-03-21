@@ -38,10 +38,11 @@
             <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" width="150">
+        <el-table-column fixed="right" label="操作" width="230">
           <template slot-scope="scope">
             <el-button type="primary" plain size="small" @click="handleRole(scope.$index,scope.row)">角色</el-button>
             <el-button size="small" @click="handleEdit(scope.$index,scope.row)">编辑</el-button>
+            <el-button type="primary" :disabled="isUserAble(scope.row)" plain size="small" @click="handleRelation(scope.row)">用户</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -71,6 +72,14 @@ export default {
     }
   },
   methods: {
+    // 是否有自己的用户（是否为经理）
+    isUserAble (row) {
+      return !(row.roles ? row.roles.some((item) => { return item.id === 2 }) : false)
+    },
+    // 跳转到关系页，id是经理的用户id
+    handleRelation (row) {
+      this.$router.push(`/relation/${row.userId}`)
+    },
     selectChange (list) {
       this.$emit('select-change', list.map((item) => item.userId))
     },

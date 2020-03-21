@@ -15,6 +15,7 @@ import Common from '@/common/common'
 import VeLine from 'v-charts/lib/line.common'
 import 'animate.css'
 import filters from '@/filter'
+import constant from '@/constant'
 
 require('promise.prototype.finally').shim()
 // 初始化折线图
@@ -27,6 +28,7 @@ Vue.prototype.api = api
 Vue.prototype.__ = __
 // 事件总线
 Vue.prototype.$bus = new Vue()
+Vue.prototype.$const = constant
 
 Vue.use(ElementUI)
 Vue.use(Common)

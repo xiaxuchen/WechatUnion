@@ -72,5 +72,38 @@ export default {
       url: '/sysuser/logout',
       method: 'post'
     })
+  },
+  /**
+   * 获取我的信息
+   * @returns {*}
+   */
+  getMineInfo () {
+    return http.get('/sysuser/info')
+  },
+  /**
+   * 修改密码
+   * @param originPwd 原密码
+   * @param newPwd 新密码
+   * @returns {*}
+   */
+  alterPwd (originPwd, newPwd) {
+    return http.put('/sysuser/pwd', {
+      originPwd,
+      newPwd
+    })
+  },
+  /**
+   * 获取用户所属信息
+   * @param agentId 经理的id
+   * @param curPage 当前页
+   * @param pageSize 每页的size
+   * @returns {*}
+   */
+  getBelong (agentId, curPage, pageSize) {
+    return http.get('/sysuser/belong', {
+      agentId,
+      curPage,
+      pageSize
+    })
   }
 }

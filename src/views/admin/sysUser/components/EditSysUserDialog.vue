@@ -48,9 +48,6 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="客服账号" prop="account">
-              <el-input v-model="editForm.agentInfo.account"></el-input>
-            </el-form-item>
             <el-form-item label="自我简介" prop="des">
               <el-input type="textarea" v-model="editForm.agentInfo.des"></el-input>
             </el-form-item>
@@ -73,7 +70,6 @@ const FormInit = {
   headImg: '',
   agentInfo: {
     name: '',
-    account: '',
     des: ''
   }
 }
@@ -127,6 +123,9 @@ export default {
             isAgent: this.editForm.isAgent,
             isInvalid: this.editForm.isInvalid,
             headImg: this.editForm.headImg
+          }
+          if (this.editForm.phone) {
+            saveUser.phone = this.editForm.phone
           }
           // 检查密码格式
           if (this.editForm.password) {

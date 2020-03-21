@@ -1,27 +1,27 @@
 <template>
   <div class="about-info">
     <el-row>
-      <el-col :span="12" align="center">
-        <panel title="推送总览" style="width: 400px" :border="true">
-          <template>
-            <el-row class="padding-md">
-              <el-col :span="6">
-                <panel-item :count="aboutInfo.allPushCount" text="推送人数" />
-              </el-col>
-              <el-col :span="6">
-                <panel-item :count="aboutInfo.lastDayReceiveCount" text="昨日接收" />
-              </el-col>
-              <el-col :span="6">
-                <panel-item :count="aboutInfo.theMounthPushCount" text="本月次数" />
-              </el-col>
-              <el-col :span="6">
-                <panel-item :count="aboutInfo.theMounthReceiveCount" text="本月接收" />
-              </el-col>
-            </el-row>
-          </template>
-        </panel>
-      </el-col>
-      <el-col :span="12" align="center">
+      <!--<el-col :span="12" align="center">-->
+        <!--<panel title="推送总览" style="width: 400px" :border="true">-->
+          <!--<template>-->
+            <!--<el-row class="padding-md">-->
+              <!--<el-col :span="6">-->
+                <!--<panel-item :count="aboutInfo.allPushCount" text="推送人数" />-->
+              <!--</el-col>-->
+              <!--<el-col :span="6">-->
+                <!--<panel-item :count="aboutInfo.lastDayReceiveCount" text="昨日接收" />-->
+              <!--</el-col>-->
+              <!--<el-col :span="6">-->
+                <!--<panel-item :count="aboutInfo.theMounthPushCount" text="本月次数" />-->
+              <!--</el-col>-->
+              <!--<el-col :span="6">-->
+                <!--<panel-item :count="aboutInfo.theMounthReceiveCount" text="本月接收" />-->
+              <!--</el-col>-->
+            <!--</el-row>-->
+          <!--</template>-->
+        <!--</panel>-->
+      <!--</el-col>-->
+      <el-col :span="12" :push="12" align="center">
         <panel title="用户总览" style="width: 400px" :border="true">
           <template>
             <el-row class="padding-sm">

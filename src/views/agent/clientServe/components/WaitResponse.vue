@@ -207,7 +207,8 @@ export default {
         isUser: false,
         time: null,
         message,
-        userId: openId
+        userId: openId,
+        type: 0
       }
       this.api.message.sendMessage(type, message, openId)
         .commonThen((success, data) => {

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import QS from 'qs'
 import { urlHost } from './apiconst'
-import router from '@/router'
+import constant from '@/constant'
 
 /*
   @ 创建自定义axios实例
@@ -50,7 +50,7 @@ instance.interceptors.response.use(
     switch (code) {
       // 当用户未登录的时候导航到登录页面
       case 20001: {
-        location.pathname = router.loginPath
+        location.pathname = constant.loginPath
         return Promise.reject(response.data.msg)
       }
     }

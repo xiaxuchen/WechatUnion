@@ -80,6 +80,7 @@ export default {
             this.$message('保存成功')
             this.$bus.$emit('change-edit-sys-dialog', false)
             this.$bus.$emit('on-user-list-update')
+            this.$store.dispatch('manager/refresh')
           } else {
             this.$message.error('保存失败:' + data)
           }

@@ -45,9 +45,6 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-form-item label="客服账号" prop="account">
-              <el-input v-model="addForm.account"></el-input>
-            </el-form-item>
             <el-form-item label="自我简介" prop="des">
               <el-input type="textarea" v-model="addForm.des"></el-input>
             </el-form-item>
@@ -67,7 +64,6 @@ const FormInit = {
   isAgent: false,
   name: '',
   sex: null,
-  account: '',
   phone: '',
   des: '',
   headImg: ''

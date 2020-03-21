@@ -29,6 +29,8 @@ import VTags from '@/components/Tags'
 import LoadingDialog from '@/components/LoadingDialog'
 export default {
   mounted () {
+    // 刷新当前用户信息
+    this.$store.dispatch('manager/refresh')
     this.scrollHeight = (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight) - 70 - 34
     this.$store.commit('system/setAvailableHeight', this.scrollHeight)
     window.onresize = () => {
@@ -62,10 +64,6 @@ export default {
             {
               path: '/sysUser',
               title: '用户管理'
-            },
-            {
-              path: '/relation',
-              title: '关系管理'
             }
           ]
         }

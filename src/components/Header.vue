@@ -7,6 +7,13 @@
         <div class="sys-name">联通公众号管理系统</div>
         <div class="header-right">
             <div class="header-user-con">
+                <div class="btn-download">
+                  <a style="cursor: pointer;" :href="this.api.baseURL + '/resource/template/phone'">
+                    <el-tooltip effect="dark" content="excel模板" placement="bottom">
+                      <i style="color: #FFF;" class="el-icon-download"></i>
+                    </el-tooltip>
+                  </a>
+                </div>
                 <!-- 全屏显示 -->
                 <div class="btn-fullScreen" @click="handleFullScreen">
                     <el-tooltip effect="dark" :content="fullScreen?`取消全屏`:`全屏`" placement="bottom">
@@ -60,7 +67,7 @@ export default {
       if (command === 'logout') {
         this.$bus.$emit('show-loading-dialog')
         this.$store.dispatch('manager/logout').then(() => {
-          location.pathname = this.$router.loginPath
+          location.pathname = this.$const.loginPath
         }).catch(reason => {
           this.$message.error(reason)
         }).finally(() => {
@@ -144,7 +151,11 @@ export default {
         margin-right: 5px;
         font-size: 24px;
     }
-    .btn-bell, .btn-fullScreen{
+    .btn-download {
+      font-size: 24px;
+      margin: 5px;
+    }
+    .btn-download,.btn-bell,.btn-fullScreen{
         position: relative;
         width: 30px;
         height: 30px;

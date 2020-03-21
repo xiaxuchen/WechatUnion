@@ -13,6 +13,9 @@ export default {
   components: {
     AboutInfo
   },
+  activated () {
+    console.log('gagag')
+  },
   mounted () {
     this.api.push.getIndexData()
       .then(this.api.commonResp((success, data) => {

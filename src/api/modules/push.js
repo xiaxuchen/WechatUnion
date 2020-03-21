@@ -77,6 +77,6 @@ export default {
    * 获取首页的数据
    */
   getIndexData () {
-    return http.get('/indexData')
+    return http.get('/push/index')
   }
 }
