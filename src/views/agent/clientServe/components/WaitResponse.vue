@@ -34,6 +34,7 @@ import UserItem from './UserItem'
 import ChatItem from './ChatItem'
 import MessageHeader from './MessageHeader'
 import ChatInput from './ChatInput'
+import {ListMap} from '@/utils/ListMap'
 export default {
   mounted () {
     // 断开某用户
@@ -47,16 +48,19 @@ export default {
         }
       }, this)
     })
-    // 更新聊天列表
-    this.getChatUserList()
     this.$bus.$on('send-message', (type, content, openId) => {
       this.sendMessageToUser(type, content, openId)
+    })
+    this.$bus.$on('ws-agent-user', (users) => {
+      users.forEach((user) => {
+        this.chatUserListMap.push(user.id, user)
+      })
     })
   },
   data () {
     return {
-      // 当前聊天的所有用户
-      chatUserList: [],
+      // 当前经理的聊天列表
+      chatUserListMap: new ListMap(),
       userMap: {},
       // 当前聊天的用户的信息列表
       chatInfoList: [],
@@ -67,6 +71,10 @@ export default {
     }
   },
   computed: {
+    // 聊天用户列表
+    chatUserList () {
+      return this.chatUserListMap.getRange()
+    },
     // 当前聊天的用户
     chatUser () {
       return this.$store.state.message.curChatUser

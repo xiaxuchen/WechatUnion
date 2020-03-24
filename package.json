@@ -25,6 +25,8 @@
     "lodash": "^4.17.15",
     "promise.prototype.finally": "^3.1.2",
     "qs": "^6.9.1",
+    "sockjs-client": "^1.4.0",
+    "stompjs": "^2.3.3",
     "universal-cookie": "^4.0.3",
     "v-charts": "^1.19.0",
     "vue": "^2.5.2",

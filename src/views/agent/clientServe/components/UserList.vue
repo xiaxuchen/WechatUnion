@@ -1,7 +1,7 @@
 <template>
     <div class="user-list" :style="{height:height - 220 + 'px'}">
       <el-table :show-header="false"
-        :data="userData.userList"
+        :data="userList"
       empty-text="暂无消息">
         <el-table-column type="selection" v-if="selectable">
           <template slot-scope="scope">
@@ -34,15 +34,16 @@
         layout="prev, pager, next, jumper,total"
         :total="userData.total"
         :current-page="userData.curPage"
-        @change="pageChange"
-        :page-size="10"
-        v-show="userData.total > 10"
+        @change-change="pageChange"
+        :page-size="pageSize"
+        v-show="userData.total > pageSize"
       />
     </div>
 </template>
 
 <script>
 export default {
+  inject: ['pageSize'],
   props: {
     height: Number,
     selectable: {
@@ -80,6 +81,11 @@ export default {
           value.checked = true
         }
       })
+    }
+  },
+  computed: {
+    userList () {
+      return this.userData.userList.getRange()
     }
   }
 }

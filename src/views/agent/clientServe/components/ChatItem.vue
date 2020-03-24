@@ -1,7 +1,7 @@
 <template>
   <div class="box">
-    <div class="chart-timer" v-if="info.time">
-      {{info.time}}
+    <div class="chart-timer">
+      {{JSON.stringify(info)}}
     </div>
     <div class="item">
       <el-row>
@@ -59,7 +59,7 @@ export default {
 
     .chart-timer{
       text-align: center;
-      color: #616161;
+      color: #000000;
       font-size: 13px;
     }
   }

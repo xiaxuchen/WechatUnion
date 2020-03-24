@@ -21,10 +21,28 @@ import WaitResponse from './components/WaitResponse'
 import TabHeader from './components/TabHeader'
 import WaitAccess from './components/WaitAccess'
 import Setting from './components/Setting'
+import {ChatWebSocket} from '@/utils/ChatWebSocket'
 export default {
+  provide () {
+    return {
+      webSocket: this.webSocket,
+      connectSuccess: this.connectSuccess
+    }
+  },
   computed: {
     height () {
       return this.$store.state.system.availableHeight
+    },
+    // websocket连接的url
+    url () {
+      return `${this.api.baseURL}/chat?token=${this.token}`
+    },
+    userId () {
+      if (this.$store.state.manager.manager) { return this.$store.state.manager.manager.id }
+      return null
+    },
+    token () {
+      return this.$store.state.manager.token
     }
   },
   components: {
@@ -36,9 +54,30 @@ export default {
   },
   data () {
     return {
+      // 连接成功事件
+      connectSuccess: 'ws-chat-connect-success',
       curTab: 0,
-      scrollHeight: 0
+      scrollHeight: 0,
+      webSocket: null
     }
+  },
+  mounted () {
+    // 直到有userId再去连接
+    this.$util.timeoutInterval((stop) => {
+      if (!this.userId && !this.token) {
+        return
+      }
+      // 如果已经有了就断开重连
+      if (this.webSocket) {
+        this.webSocket.close()
+      }
+      this.webSocket = new ChatWebSocket(this.url, (resp) => {
+        // 连接成功发送事件
+        this.$bus.$emit(this.connectSuccess, this.webSocket, this.user, resp)
+      }, {id: this.userId})
+      this.webSocket.open()
+      stop()
+    })
   },
   methods: {
     toggleTab (tab) {
@@ -47,6 +86,9 @@ export default {
     },
     showStateToggle () {
     }
+  },
+  beforeDestroy () {
+    this.webSocket.close()
   }
 }
 </script>
