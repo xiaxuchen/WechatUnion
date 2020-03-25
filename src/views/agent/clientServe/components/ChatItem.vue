@@ -1,7 +1,7 @@
 <template>
   <div class="box">
-    <div class="chart-timer">
-      {{JSON.stringify(info)}}
+    <div class="chart-timer" v-if="info.time">
+      {{info.time}}
     </div>
     <div class="item">
       <el-row>
@@ -12,7 +12,7 @@
           <message-shower class="message" :message="info"></message-shower>
         </el-col>
         <el-col v-if="info.isUser === false" :span="2" :push="2" class="text-center">
-          <head-image :styles="{ width: '42px', height: '42px', borderRadius: '100px'}" :url="$store.state.manager.manager.headImg" />
+          <head-image  :styles="{ width: '42px', height: '42px', borderRadius: '100px'}" :url="$store.state.manager.manager.headImg" />
         </el-col>
       </el-row>
     </div>

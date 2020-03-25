@@ -1,15 +1,15 @@
 <template>
     <div class="message-header">
       <el-row>
-        <el-col :span="2">
+        <el-col :span="8">
           {{chatUser.name}}
         </el-col>
-        <el-col :span="1" :push="20">
+        <el-col :span="1" :push="13">
           <el-tooltip effect="dark" content="转接" placement="bottom" class="icon-button">
             <q class="el-icon-refresh" ></q>
           </el-tooltip>
         </el-col>
-        <el-col :span="1" :push="20">
+        <el-col :span="1" :push="13">
           <el-tooltip effect="dark" content="关闭会话" placement="bottom" class="icon-button">
             <q class="el-icon-remove-outline" @click="$bus.$emit('session-disconnect', chatUser.id)"></q>
           </el-tooltip>

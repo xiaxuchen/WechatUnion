@@ -4,12 +4,13 @@
         <el-col :span="2" align="center">
           <el-popover
             placement="top-start"
-            title="标题"
+            title="表情"
             trigger="click"
-            content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
+            v-model="visible"
+            >
             <q slot="reference" class="fa fa-smile-o icon-button"></q>
             <template>
-              <emotion :width="400" :height="200"/>
+              <emotion @emotion-click="inputEmotion" :width="400" :height="200"/>
             </template>
           </el-popover>
         </el-col>
@@ -24,7 +25,7 @@
       </el-row>
       <el-row style="margin-top: 10px">
         <el-col>
-          <el-input type="textarea" @keyup.enter.native="sendTextMessage()" v-model="textMessage" size="medium" resize="none" class="transparent text-message-input" />
+          <el-input id="chatInput" type="textarea" @keyup.enter.native="sendTextMessage()" v-model="textMessage" size="medium" resize="none" class="transparent text-message-input" />
         </el-col>
       </el-row>
       <el-row style="margin-top: 10px">
@@ -44,7 +45,8 @@ const messageType = {
 export default {
   data () {
     return {
-      textMessage: null
+      textMessage: '',
+      visible: false
     }
   },
   components: {
@@ -59,6 +61,18 @@ export default {
     sendTextMessage () {
       this.$bus.$emit('send-message', messageType.text, this.textMessage, this.curChatUser.id)
       this.textMessage = ''
+    },
+    inputEmotion (emotion) {
+      let chatInput = document.getElementById('chatInput')
+      let start = chatInput.selectionStart
+      let end = chatInput.selectionEnd
+      console.log(start, end)
+      if (start === undefined || end === undefined) {
+        return
+      }
+      this.textMessage = this.textMessage.substring(0, start) + emotion + this.textMessage.substring(end)
+      this.visible = false
+      chatInput.focus()
     }
   }
 }

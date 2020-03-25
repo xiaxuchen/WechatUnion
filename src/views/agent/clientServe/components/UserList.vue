@@ -2,14 +2,16 @@
     <div class="user-list" :style="{height:height - 220 + 'px'}">
       <el-table :show-header="false"
         :data="userList"
+        v-loading="loading"
+        @select="handleSelectionChange"
       empty-text="暂无消息">
         <el-table-column type="selection" v-if="selectable">
-          <template slot-scope="scope">
-            <el-checkbox
-              @change="handleSelectionChange(scope.row)"
-              v-model="scope.row.checked"
-            />
-          </template>
+          <!--<template slot-scope="scope">-->
+            <!--<el-checkbox-->
+              <!--@change="handleSelectionChange(scope.row)"-->
+              <!--v-model="scope.row.checked"-->
+            <!--/>-->
+          <!--</template>-->
         </el-table-column>
         <el-table-column prop="headImg">
           <template slot-scope="{row,$index}">
@@ -50,7 +52,8 @@ export default {
       type: Boolean,
       default: true
     },
-    userData: Object
+    userData: Object,
+    loading: Boolean
   },
   data () {
     return {
@@ -66,7 +69,7 @@ export default {
       this.$emit('update:userData.curPage', page)
     },
     // 选择变化的时候将当前选中的传递出去
-    handleSelectionChange (row) {
+    handleSelectionChange (selection, row) {
       if (this.selectable) {
         this.selectMap[`user${row.userId}`] = row
         this.$emit('select', this.selectMap)
@@ -75,11 +78,15 @@ export default {
   },
   watch: {
     // 更新选中状态
-    userData (newValue) {
-      newValue.userList.forEach(value => {
-        if (this.selectMap[`user${value.userId}`]) {
-          value.checked = true
-        }
+    userList (newValue) {
+      this.userData.userList.getRange().forEach(value => {
+        // if (!this.selectMap[`user${value.userId}`]) {
+        //   value.checked = false
+        // } else {
+        //   value.checked = true
+        // }
+        console.log(value.checked)
+        console.log('更新选中', this.selectMap[`user${value.userId}`])
       })
     }
   },

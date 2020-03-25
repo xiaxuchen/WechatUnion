@@ -19,13 +19,14 @@
               <q class="el-icon-loading" ></q>
             </div>
             <div class="text-center text-brand font-sm cursor-pointer" v-show="!loadingMessage">
-              <el-button type="text" @click="loadHistory" v-show="!chatUser.noMore">查看更多</el-button>
+              <el-button type="text" @click="loadHistory" v-show="!chatUser.noMore">{{chatUser.noMore}}查看更多</el-button>
             </div>
             <chat-item v-for="(chatInfo,index) in chatInfoList" :key="index" :info="chatInfo" />
           </div>
           <chat-input />
         </div>
       </el-main>
+      <audio controls="controls" ref="audio" src='http://www.xmf119.cn/static/admin/sounds/notify.wav' hidden='true' />
     </el-container>
 </template>
 
@@ -35,7 +36,9 @@ import ChatItem from './ChatItem'
 import MessageHeader from './MessageHeader'
 import ChatInput from './ChatInput'
 import {ListMap} from '@/utils/ListMap'
+
 export default {
+  inject: ['connectSuccess'],
   mounted () {
     // 断开某用户
     this.$bus.$on('session-disconnect', (openId) => {
@@ -51,9 +54,53 @@ export default {
     this.$bus.$on('send-message', (type, content, openId) => {
       this.sendMessageToUser(type, content, openId)
     })
-    this.$bus.$on('ws-agent-user', (users) => {
-      users.forEach((user) => {
-        this.chatUserListMap.push(user.id, user)
+    this.$bus.$on(this.connectSuccess, (ws, managerId) => {
+      // 初始获取当前的用户列表
+      ws.subscribe('/message/chatting/users', (body) => {
+        this.updateUserList(body)
+      })
+
+      // 监听消息的数量的变化
+      ws.subscribe(`/user/${managerId}/chatUser/message/count`, (body) => {
+        let time = this.lastRequestTime['messageChange'] || 0
+        if (body.time > time) {
+          this.chatUserListMap.get(body.openId).notRead = body.count
+          this.lastRequestTime['messageChange'] = body.time
+          this.updateRespCount()
+        }
+      })
+
+      // 监听新消息
+      ws.subscribe(`/user/${managerId}/chatUser/message`, (body) => {
+        let time = this.lastRequestTime['newMessage'] || 0
+        if (body.time > time) {
+          const openId = body.message.userId
+          // 如果不是当前用户就只更新未读数
+          if (!this.isCurUser(openId)) {
+            this.setLastMsg(openId, body.message, body.count)
+            this.receiveNotCurMsg(openId, body.message)
+            return
+          }
+          this.setLastMsg(openId, body.message)
+          this.updateMessages([body.message], openId)
+          this.lastRequestTime['newMessage'] = body.time
+        }
+      })
+
+      // 监听接收用户成功
+      ws.subscribe(`/user/${managerId}/chatUser/user/received`, (body) => {
+      })
+
+      // 监听用户退出聊天
+      ws.subscribe(`/user/${managerId}/chatUser/user/exit`, (body) => {
+        let time = this.lastRequestTime['userExit'] || 0
+        if (body.time > time) {
+          this.lastRequestTime['userExit'] = body.time
+          // 从聊天列表中删除
+          const user = this.chatUserListMap.delete(body.openId)[0]
+          console.log(user)
+          this.$message(`${user.name} 已结束聊天`)
+        }
       })
     })
   },
@@ -64,10 +111,14 @@ export default {
       userMap: {},
       // 当前聊天的用户的信息列表
       chatInfoList: [],
-      lastRequestTime: 0,
+      messageListMap: new ListMap(),
+      lastRequestTime: {},
+      hintMusic: 'http://www.xmf119.cn/static/admin/sounds/notify.wav',
       // 所有已加载的用户聊天记录列表
       userChatMap: {},
-      loadingMessage: false
+      loadingMessage: false,
+      // 接受到的不是用户的消息
+      receivedMessage: new ListMap()
     }
   },
   computed: {
@@ -84,6 +135,37 @@ export default {
     }
   },
   methods: {
+    /*
+    * 更新待回复的数量
+    * */
+    updateRespCount () {
+      let waitResp = 0
+      this.chatUserList.forEach((user) => {
+        if (user.notRead > 0) {
+          waitResp++
+        }
+      })
+      this.$store.commit('message/setRespondCount', waitResp)
+    },
+    /*
+    * 接受不是当前用户的信息
+    * */
+    receiveNotCurMsg (openId, msg) {
+      // 从头开始播放提示音
+      this.$refs.audio.currentTime = 0
+      // 播放
+      this.$refs.audio.play()
+      if (this.receivedMessage.exist(openId)) {
+        // 如果存在就放入列表
+        let msgList = this.receivedMessage.get(openId)
+        msgList.push(msg)
+      } else {
+        // 如果不存在就新建一个然后放入消息，在推入ListMap中
+        let msgList = []
+        msgList.push(msg)
+        this.receivedMessage.push(openId, msgList)
+      }
+    },
     // 获取当前聊天的所有用户信息，并且再结束后会延迟3000ms再次获取
     getChatUserList () {
       this.api.message.getChatUserList()
@@ -98,65 +180,97 @@ export default {
           }, 3000)
         })
     },
+    /**
+     * 设置消息的未读条数
+     * **/
+    setLastMsg (openId, lastMessage, count) {
+      if (this.chatUserListMap.get(openId)) {
+        if (count) {
+          this.chatUserListMap.get(openId).notRead = count
+        }
+        this.chatUserListMap.get(openId).lastMessage = lastMessage
+        this.updateRespCount()
+      }
+    },
     // 更新用户列表的数据(主要是更新用户的未读消息和最后一条消息)
     updateUserList (userList) {
+      let waitResp = 0
       userList.forEach((user) => {
-        let index = this.userMap[`user${user.id}`]
-        if (index == null) {
-          // 不存在这个用户则将其加入列表
-          this.chatUserList.push(user)
-          // userMap记录其所在的位置
-          this.userMap[`user${user.id}`] = this.chatUserList.length - 1
-        } else {
-          // 存在则更新
-          this.chatUserList.splice(index, 1, user)
-        }
-        // 如果当前用户有未读消息，就自动加载
-        if (!this.loadingMessage && this.isCurUser(user.id) && user.notRead > 0) {
-          this.loadMessage()
+        this.chatUserListMap.push(user.id, user)
+        if (user.notRead > 0) {
+          waitResp++
         }
       })
+      this.$store.commit('message/setRespondCount', waitResp)
     },
-    // 更新消息
-    updateMessages (messageList, userId) {
-      // 将新消息同步到map
-      let messages = this.userChatMap[`user${this.chatUser.id}`]
-      if (messages) {
-        // 如果列表已存在就添加进去
-        messageList.forEach((message) => {
-          this.chatInfoList.push(message)
-        })
+    /**
+     * 更新消息列表,且如果不是历史记录就去设置为已读
+     * @param messageList 新的消息列表
+     * @param userId 消息的用户id
+     * @param history 是否为历史记录
+     * @param reverse 是否需要翻转
+     * */
+    updateMessages (messageList, userId, history = false, reverse = true) {
+      let ids = messageList.map((msg) => {
+        return msg.id
+      })
+      // 将加载下来的消息设置为已读
+      if (ids && ids.length > 0) {
+        this.messageRead(ids, userId)
       } else {
-        messages = messageList
+        this.loadingMessage = false
       }
-      // 重新放回map中
-      this.userChatMap[`user${this.chatUser.id}`] = messages
+      if (!this.messageListMap.exist(userId)) {
+        this.messageListMap.push(userId, [])
+      }
+      // 如果需要翻转就翻转
+      if (reverse) {
+        messageList = messageList.reverse()
+      }
+      messageList.forEach((message) => {
+        if (history) {
+          this.messageListMap.get(userId).unshift(message)
+        } else {
+          this.messageListMap.get(userId).push(message)
+        }
+      })
       // 如果还是这个用户的话才设置进消息列表
       if (this.isCurUser(userId)) {
-        console.log('123')
-        this.chatInfoList = messages
+        this.chatInfoList = this.messageListMap.get(userId)
       }
       // 切换的时候将滚动条拖到底部
       this.$nextTick(() => {
         let chatListWrap = this.$refs.chatListWrap
-        chatListWrap.scrollTop = chatListWrap.scrollHeight
+        if (history) {
+          chatListWrap.scrollTop = 0
+        } else {
+          chatListWrap.scrollTop = chatListWrap.scrollHeight
+        }
       })
     },
     // 切换当前的聊天用户
     toggleChatUser (user) {
       // 设置当前聊天的用户
       this.$store.commit('message/setCurChatUser', user)
-      this.chatInfoList = this.userChatMap[`user${user.id}`]
-      let messageList = this.userChatMap[`user${user.id}`]
-      if (messageList != null) {
-        this.chatInfoList = messageList
-        // 切换的时候将滚动条拖到底部
-        this.$nextTick(() => {
-          let chatListWrap = this.$refs.chatListWrap
-          chatListWrap.scrollTop = chatListWrap.scrollHeight
-        })
+      // 将当前聊天的列表设置为该用户的
+      if (this.messageListMap.exist(user.id)) {
+        this.chatInfoList = this.messageListMap.get(user.id)
+      } else {
+        this.chatInfoList = []
+        this.messageListMap.push(user.id, this.chatInfoList)
       }
-      this.loadMessage()
+      /**
+       * 如果有缓存的消息，添加入列表
+       */
+      if (this.receivedMessage.exist(user.id)) {
+        // 将消息加入到列表中去，同时将这些消息设为已读
+        this.updateMessages(this.receivedMessage.get(user.id), user.id, false, false)
+        // 从缓存列表中删除
+        this.receivedMessage.delete(user.id)
+      }
+      if (this.chatInfoList.length === 0) {
+        this.loadMessage(user)
+      }
     },
     /**
      * 将消息设为已读
@@ -170,38 +284,24 @@ export default {
     /**
      * 加载消息
      */
-    loadMessage () {
+    loadMessage (user = this.chatUser) {
       this.loadingMessage = true
       // 获取最后一个消息的id
       let lastId = null
       if (this.chatInfoList && this.chatInfoList.length > 0) {
         lastId = this.chatInfoList[this.chatInfoList.length - 1].id
       }
-      let userId = this.chatUser.id
-      this.api.message.getChatMessageList(userId, lastId)
+      let userId = user.id
+      this.api.message.getHistoryMessages(userId, lastId)
         .then(this.api.commonResp((success, data) => {
           if (success) {
             // 更新消息
             this.updateMessages(data, userId)
-            let ids = data.map((msg) => {
-              return msg.id
-            })
-            // 将加载下来的消息设置为已读
-            if (ids && ids.length > 0) {
-              this.messageRead(ids, userId)
-            } else {
-              this.loadingMessage = false
-            }
           } else {
             this.loadingMessage = false
           }
         }, this)).catch(() => {
           this.loadingMessage = false
-        }).finally(() => {
-          this.$nextTick(() => {
-            let chatListWrap = this.$refs.chatListWrap
-            chatListWrap.scrollTop = chatListWrap.scrollHeight
-          })
         })
     },
     /**
@@ -211,6 +311,7 @@ export default {
      * @param openId 用户id
      */
     sendMessageToUser (type, message, openId) {
+      message = message.trim()
       let m = {
         isUser: false,
         time: null,
@@ -222,7 +323,7 @@ export default {
         .commonThen((success, data) => {
           m.id = data.data
           // 发送成功后显示
-          this.updateMessages([m])
+          this.updateMessages([m], openId)
         }, this)
     },
     /**
@@ -236,35 +337,17 @@ export default {
       const userId = this.chatUser.id
       this.api.message.getHistoryMessages(userId, lastId)
         .commonThen((success, data) => {
-          // 如果没有消息
+          // 如果没有消息，就设置不能再加载更多
           if (data.length === 0) {
-            const index = this.userMap[`user${userId}`]
-            console.log(index)
-            if (index === 0 || index) {
-              // 就给用户加上没有更多消息
-              this.chatUserList[index].noMore = true
-              console.log(this.chatUserList[index])
-              // 如果仍是当前用户，则更新到vuex
-              if (this.isCurUser(userId)) {
-                this.$store.commit('message/setCurChatUser', this.chatUserList[index])
-              }
+            this.chatUserListMap.get(userId).noMore = true
+            console.log(data.length, this.chatUserListMap.get(userId), this.isCurUser(userId))
+            // 如果仍是当前用户，则更新到vuex
+            if (this.isCurUser(userId)) {
+              this.$store.commit('message/setCurChatUser', {...this.chatUserListMap.get(userId)})
             }
+            return
           }
-          let infoList = this.userChatMap[`user${userId}`]
-          if (!infoList) {
-            infoList = []
-          }
-          // 将信息放入开头
-          data.forEach((msg) => {
-            infoList.unshift(msg)
-          })
-          this.chatInfoList = infoList
-          // 将用户的消息放入用户的聊天的map
-          this.userChatMap[`user${userId}`] = infoList
-          // 如果还是当前用户，就更新到消息list中去
-          if (this.isCurUser(userId)) {
-            this.chatInfoList = infoList
-          }
+          this.updateMessages(data, userId, true)
         })
     },
     /**

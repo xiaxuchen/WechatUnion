@@ -76,12 +76,13 @@ export default {
   /**
    * 将消息设置为已读
    * @param messageIds 消息的id
-   * @param userId 用户id
+   * @param openId 聊天用户id
    * @returns {*}
    */
-  setMessagesRead (messageIds, userId) {
+  setMessagesRead (messageIds, openId) {
     return http.put('/message/list/read', {
-      messageIds
+      messageIds,
+      openId
     })
   },
   /**

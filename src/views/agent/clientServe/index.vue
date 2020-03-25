@@ -1,5 +1,8 @@
 <template>
-      <div :style="{height:height - 30 + 'px'}" class="client-serve">
+      <div :style="{height:height - 10 + 'px'}" class="client-serve">
+        <div class="text-center padding-md" style="color: #fff">
+          <q class="el-icon-warning"></q> 若出现无响应情况，请刷新页面
+        </div>
         <Panel :title-style="{backgroundColor: '#42494b',color: '#fff'}" :border="false">
           <template slot="title">
             <tab-header @toggle-tab="toggleTab" />
@@ -73,7 +76,7 @@ export default {
       }
       this.webSocket = new ChatWebSocket(this.url, (resp) => {
         // 连接成功发送事件
-        this.$bus.$emit(this.connectSuccess, this.webSocket, this.user, resp)
+        this.$bus.$emit(this.connectSuccess, this.webSocket, this.userId, resp)
       }, {id: this.userId})
       this.webSocket.open()
       stop()
@@ -105,7 +108,7 @@ export default {
 <style scoped lang="less">
   .client-serve {
     background-image: url("https://res.wx.qq.com/mpkf/zh_CN/images/background4706d9.png");
-    padding: 30px 120px 0 120px;
+    padding: 10px 120px 0 120px;
   }
 
 </style>

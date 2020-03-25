@@ -3,12 +3,12 @@ const KEY_PREFIX = 'keys'
 
 // 获取真正的键
 const getKey = (key) => {
-  return `${KEY_PREFIX}-key`
+  return `${KEY_PREFIX}-${key}`
 }
 
 // 判断非空
 const notNull = (obj) => {
-  return (!obj && typeof (obj) !== 'undefined') || obj === 0
+  return (obj && (typeof obj !== 'undefined')) || obj === 0
 }
 
 export class ListMap {
@@ -35,14 +35,11 @@ export class ListMap {
    */
   delete (key) {
     const index = this.__keyMap[getKey(key)]
-    console.log(notNull(index))
     if (notNull(index)) {
       // 删除掉键map中的对应index
       delete this.__keyMap[getKey(key)]
-      console.log('before delete :', JSON.stringify(this.__data))
       // 删除该值
-      this.__data.splice(index, 1)
-      console.log('after delete :', JSON.stringify(this.__data))
+      return this.__data.splice(index, 1)
     }
   }
 

@@ -3,24 +3,33 @@
       <div class="user-search">
         <div class="selection" >
           <el-row>
-            <el-col :span="8" :push="6">
-              <el-input placeholder="搜索" prefix-icon="el-icon-search" size="mini"/>
+            <el-col :span="6" :push="5">
+              <el-input placeholder="搜索" v-model="searcher[curTab].searchKey" prefix-icon="el-icon-search" size="mini"/>
             </el-col>
-            <el-col :span="6" :push="8">
+            <el-col :span="6" :push="6">
               <!--TODO 不知道这个v-model和value会不会冲突-->
-              <el-select size="mini" style="margin-right: 20px" v-model="tags" value="tags"></el-select>
+              <el-select size="mini" style="margin-right: 20px" v-model="searcher[curTab].tagId">
+                <el-option
+                  v-for="item in tags"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id" ></el-option>
+              </el-select>
             </el-col>
-            <el-col :span="5" :push="8">
-              <el-checkbox label="只看我的" style="margin-right: 20px" />
+            <el-col :span="4" :push="6">
+              <el-checkbox v-model="searcher[curTab].agentId" style="margin-right: 20px" >
+                只看我的
+              </el-checkbox>
             </el-col>
-            <el-col :span="3" :push="8">
-              <el-button type="success" size="mini" @click="receiveUser"  v-show="curTab !== '已过期'">接入</el-button>
+            <el-col :span="6" :push="7">
+              <el-button type="success" size="mini" @click="searchUsers" >搜索</el-button>
+              <el-button type="success" size="mini" @click="receiveUser" >接入</el-button>
             </el-col>
           </el-row>
         </div>
         <el-tabs v-model="curTab" >
           <el-tab-pane label="待接入" name="待接入">
-              <user-list :height="height" :user-data.sync="waitData" @select="onSelectChange"/>
+              <user-list :loading="waitLoading" :height="height" :user-data.sync="waitData" @select="onSelectChange"/>
           </el-tab-pane>
           <!--<el-tab-pane label="已过期" name="已过期">-->
             <!--<user-list :height="height" :selectable="false"/>-->
@@ -51,43 +60,44 @@ export default {
   computed: {
     ...mapState({
       height: 'system.availableHeight',
-      managerId: 'manager.manager.id',
       waitCount: 'message.waitCount'
-    })
-  },
-  mounted () {
-    // 接入用户
-    this.$bus.$on('receive-waiting', () => {
-      this.receiveWaitingUser()
-    })
-    // websocket连接成功
-    this.$bus.$on(this.connectSuccess, (ws) => {
-      this.webSocket = ws
-      // 初始时获取等待的用户的信息
-      ws.subscribe('/message/waiting/users', (body) => {
-        this.updateWaitingUsers(body, true)
-      })
-      // 关注总的等待用户的数量
-      ws.subscribe('/chatUser/waiting/count', (body) => {
-        this.updateWaitTotal(body.count, body.time)
-        this.loadList()
-      })
-      // 关注用户已被获取，若存在于我们的列表中，就移除他
-      ws.subscribe('/chatUser/user/received', (body) => {
-        this.waitData.userList.delete(body.openId)
-        this.updateWaitTotal(body.count, body.time)
-      })
-      // 关注等待用户的更新，也就是当我们的消息发送过去后，接受返回并显示
-      ws.subscribe('/user/waitUser/users', (body) => {
-        this.updateWaitingUsers(body)
-      })
-    })
+    }),
+    managerId () {
+      if (this.$store.state.manager.manager) {
+        return this.$store.state.manager.manager.id
+      }
+      return null
+    }
   },
   data () {
     return {
+      // 等待的用户在加载
+      waitLoading: false,
       webSocket: null,
       pageSize: 20,
-      tags: [],
+      tags: [{
+        name: '所有用户',
+        id: -1
+      }, {
+        name: 'vip',
+        id: 1
+      }, {
+        name: '普通用户',
+        id: 2
+      }],
+      // 搜索的dto
+      searcher: {
+        '待接入': {
+          tagId: -1,
+          agentId: false,
+          searchKey: ''
+        },
+        '可回访': {
+          tagId: -1,
+          agentId: false,
+          searchKey: ''
+        }
+      },
       curTab: '待接入',
       lastCountUpdateTime: 0,
       waitData: {
@@ -108,6 +118,38 @@ export default {
       }
     }
   },
+  mounted () {
+    // 接入用户
+    this.$bus.$on('receive-waiting', () => {
+      this.receiveWaitingUser()
+    })
+    // websocket连接成功
+    this.$bus.$on(this.connectSuccess, (ws) => {
+      this.webSocket = ws
+      // 初始时获取等待的用户的信息
+      ws.subscribe('/message/waiting/users', (body) => {
+        this.updateWaitingUsers(body, true)
+      })
+      // 关注总的等待用户的数量
+      ws.subscribe('/chatUser/waiting/count', (body) => {
+        this.updateWaitTotal(body.count, body.time)
+        // 根据当前是否为空刷新列表
+        this.updateWhenEmpty()
+      })
+      // 关注用户已被获取，若存在于我们的列表中，就移除他
+      ws.subscribe('/chatUser/user/received', (body) => {
+        // 删除已有的，更新等待总数
+        this.waitData.userList.delete(body.openId)
+        this.updateWaitTotal(body.count, body.time)
+        // 根据当前是否为空刷新列表
+        this.updateWhenEmpty()
+      })
+      // 关注等待用户的更新，也就是当我们的消息发送过去后，接受返回并显示
+      ws.subscribe('/user/waitUser/users', (body) => {
+        this.updateWaitingUsers(body)
+      })
+    })
+  },
   methods: {
     /*
     ** 接受用户
@@ -123,9 +165,22 @@ export default {
       }
       this.$store.commit('system/toggleLoading', true)
       this.api.message.receiveUsers(idList)
-        .commonThen((success) => {
+        .commonThen((success, data) => {
           if (success) {
-            this.$message('接入成功')
+            if (data.length > 0) {
+              const errorList = data.map((openId) => {
+                console.log(openId)
+                return this.waitData.userList.get(openId).name
+              }).toString()
+              this.$message.error(errorList + ' 接入失败，已被其他经理接入或已离线')
+            } else {
+              this.$message('接入成功')
+            }
+            // 将选择的用户清除
+            idList.forEach((openId) => {
+              console.log('delete openId', openId)
+              this.waitData.userList.delete(openId)
+            })
             this.waitData.selectMap = {}
           }
         }, this).finally(() => {
@@ -147,37 +202,52 @@ export default {
       userPage.data.forEach((user) => {
         this.waitData.userList.push(user.id, user)
       })
+      this.waitLoading = false
     },
-    loadList () {
-      if (!this.webSocket) {
+    /**
+     * 发送消息加载用户列表
+     * @param 当前页
+     * @param 是否强制获取
+     **/
+    loadList (curPage = this.curPage, focus = false) {
+      if (!this.webSocket || this.waitLoading) {
         return
       }
-      this.webSocket.send('/message/waitUser/users', {
-        curPage: 1,
-        tagId: this.tagId,
-        searchKey: this.searchKey,
-        agentId: this.managerId
-      })
+      console.log(JSON.stringify(this.searcher))
+      const searcher = {
+        curPage,
+        ...this.searcher[this.curTab]
+      }
+      if (searcher.agentId) {
+        searcher.agentId = this.managerId
+      } else {
+        delete searcher.agentId
+      }
+      console.log(JSON.stringify(searcher))
+      this.webSocket.send('/message/waitUser/users', searcher)
+      this.waitLoading = true
+    },
+    // 当前列表空了才更新
+    updateWhenEmpty () {
+      // 没有人在等或者当前列表不为空就不更新
+      if (this.waitCount === 0 || !this.waitData.userList.isEmpty()) {
+        return
+      }
+      this.updateList()
     },
     /*
     * 当由于列表的用户都被其他经理接受时，重新加载此列表
+    * @param focus 是否强制更新
     * **/
-    updateList () {
+    updateList (focus = false) {
       let {curPage, total} = this.waitData
       const pageCount = (total / this.pageSize + total % this.page ? 1 : 0)
       // 如果当前页比真实页小，就跳转到第一页去
       if (pageCount < curPage) {
         curPage = 1
       }
-      // 发送请求告知服务端，发送新的数据过来
-      // this.webSocket.send({
-      //   type: 1,
-      //   name: 'getWaitingUsers',
-      //   content: {
-      //     curPage: curPage,
-      //     pageSize: this.pageSize
-      //   }
-      // })
+      // 请求服务器
+      this.loadList(curPage)
     },
     /**
      * 将子组件中的选中的数据传输到父组件中
@@ -191,24 +261,11 @@ export default {
         this.$store.commit('message/setWaitCount', count)
       }
     },
-    /**
-     * 加载正在等待的用户
-     * */
-    // loadWaitUser () {
-    //   this.api.message.getWaitingUsers(this.waitData.curPage)
-    //     .commonThen((success, data) => {
-    //       if (success) {
-    //         this.waitData.userList = data.data
-    //         this.waitData.total = data.total
-    //         this.$store.commit('message/setWaitCount', data.total)
-    //       }
-    //     }).finally(() => {
-    //       // 延迟一下去更新一下
-    //       setTimeout(() => {
-    //         this.loadWaitUser()
-    //       }, 1500)
-    //     })
-    // },
+    searchUsers () {
+      if (this.curTab === '待接入') {
+        this.updateList(true)
+      }
+    },
     /**
      * 根据当前面板选择接入用户的事件
      */
