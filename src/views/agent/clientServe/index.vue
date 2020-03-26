@@ -20,7 +20,7 @@
 
 <script>
 import Panel from '@/components/Panel'
-import WaitResponse from './components/WaitResponse'
+import WaitResponse from './components/WaitResponse/index'
 import TabHeader from './components/TabHeader'
 import WaitAccess from './components/WaitAccess'
 import Setting from './components/Setting'

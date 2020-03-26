@@ -12,8 +12,8 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="手机号">
-            <el-input v-model="phones" placeholder="多个手机号，以空格间隔"></el-input>
+          <el-form-item label="关键字">
+            <el-input v-model="searchKey" placeholder="电话或用户昵称"></el-input>
           </el-form-item>
           <el-form-item align="center">
             <el-button @click="resetSearch">重置</el-button>
@@ -23,7 +23,7 @@
       </div>
       <el-tabs v-model="activeTab">
         <el-tab-pane label="用户列表" name="用户列表">
-          <push-user-list :tag-selected="tagSelected" :phones="phones"/>
+          <push-user-list :tag-selected="tagSelected" :search-key="searchKey"/>
         </el-tab-pane>
         <el-tab-pane name="已选列表">
           <span slot="label">
@@ -55,7 +55,7 @@ export default {
   },
   data () {
     return {
-      phones: '',
+      searchKey: '',
       activeTab: '用户列表',
       // 当前选择的用户标签
       tagSelected: [0],
@@ -73,7 +73,7 @@ export default {
   },
   methods: {
     resetSearch () {
-      this.phones = ''
+      this.searchKey = ''
       this.tagSelected = [0]
     },
     /**

@@ -53,7 +53,7 @@ export default {
     return `<img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/${emotionIndexs[emotion]}.gif" >`
   },
   /**
-   * 将字符串转换为表情字符
+   * TODO 目前只能转化一个 将字符串转换为表情字符
    * @param str
    * @return {*}
    */

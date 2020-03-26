@@ -30,15 +30,15 @@ export default {
    * @param tagList 标签列表
    * @param curPage 当前页，从1开始
    * @param pageSize 页面大小
-   * @param phone 用户电话号码
+   * @param searchKey 搜索关键字
    * @returns {*}
    */
-  loadUserList (tagList, curPage, pageSize, phone) {
+  loadUserList (tagList, curPage, pageSize, searchKey) {
     return http.get('/push/userList', {
       tagList,
       curPage,
       pageSize,
-      phone
+      searchKey
     })
   },
   /**

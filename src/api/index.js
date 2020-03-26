@@ -2,6 +2,7 @@ import {urlHost} from './apiconst'
 import push from './modules/push'
 import sysuser from './modules/sysuser'
 import message from './modules/message'
+import tag from './modules/tag'
 
 const baseURL = urlHost
 
@@ -27,5 +28,6 @@ export default {
   push,
   sysuser,
   message,
+  tag,
   commonResp
 }

@@ -47,8 +47,17 @@ export default new Router({
           name: 'sysUser',
           component: () => import('@/views/admin/sysUser'),
           meta: {
-            title: '用户管理',
+            title: '管理员管理',
             index: '/sysUser'
+          }
+        },
+        {
+          path: 'tags',
+          name: 'tag',
+          component: () => import('@/views/admin/tags'),
+          meta: {
+            title: '用户管理',
+            index: '/tags'
           }
         },
         {

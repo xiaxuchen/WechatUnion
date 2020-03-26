@@ -1,5 +1,5 @@
 <template>
-  <div  class="aside-nav" style="background-color:#545c64" :style="{width:width + 'px'}">
+  <div  class="aside-nav" style="background-color:#545c64;" :style="{width:width + 'px',height:height + 'px'}">
     <div class="text-right" >
       <i class="fa font-lg collapse" :class="direction" style="color: white;padding: 10px 20px 0 0" @click="toggleCollapse"></i>
     </div>
@@ -38,6 +38,11 @@ export default {
       isCollapse: false,
       direction: 'fa-angle-double-left',
       widthPre: this.width
+    }
+  },
+  computed: {
+    height () {
+      return this.$store.state.system.availableHeight
     }
   },
   props: {

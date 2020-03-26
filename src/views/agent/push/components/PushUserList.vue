@@ -90,7 +90,7 @@ export default {
   },
   props: {
     tagSelected: Array,
-    phones: String
+    searchKey: String
   },
   data () {
     return {
@@ -142,25 +142,16 @@ export default {
      * 加载用户列表
      */
     loadUserList () {
-      if (this.phones.trim() !== '') {
-        let valid = this.phones.split(' ').every((phone) => {
-          if (!(/^1[3456789]\d{9}$/.test(phone))) {
-            return false
-          }
-          return true
-        })
-
-        if (!valid) {
-          this.$message.error('手机号码的格式错误')
-          return
-        }
+      let searchKey = ''
+      if (this.searchKey.trim() !== '') {
+        searchKey = this.searchKey.trim()
       }
 
       this.loading = true
       this.api.push.loadUserList(this.tagSelected,
         this.curPage,
         this.pageSize,
-        this.phones
+        searchKey
       )
         .then(this.api.commonResp((success, data) => {
           // 当请求成功了就更新数据列表

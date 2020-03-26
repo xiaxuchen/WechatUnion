@@ -63,6 +63,10 @@ export default {
           subMenus: [
             {
               path: '/sysUser',
+              title: '管理员管理'
+            },
+            {
+              path: '/tags',
               title: '用户管理'
             }
           ]
