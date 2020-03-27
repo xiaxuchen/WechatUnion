@@ -5,5 +5,6 @@ export default class BaseBusiness {
    */
   constructor (context) {
     this.context = context
+    this.$common = context.$common
   }
 }

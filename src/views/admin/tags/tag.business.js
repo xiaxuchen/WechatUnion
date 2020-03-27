@@ -42,7 +42,7 @@ export default class TagBusiness extends BaseBusiness {
     api.tag.addTag(tagName)
       .commonThen((success, data) => {
         // 将列表添加进标签列表
-        this.tagList.splice(0, 0, data)
+        this.context.tagList.splice(0, 0, data)
       }, this.context).finally(() => {
         this.$common.hideLoading()
       })
@@ -84,13 +84,49 @@ export default class TagBusiness extends BaseBusiness {
     api.tag.getTagListWithCount()
       .commonThen((success, data) => {
         this.context.tagList = data
-        if (this.context.tagList.length > 0) {
-          this.context.curTagId = this.context.tagList[0].id
-          this.netLoadUsers(() => {
-            this.$common.hideLoading()
-          })
-        }
+        this.netLoadUsers(() => {
+          this.$common.hideLoading()
+        })
       }, this.context).catch(() => {
+        this.$common.hideLoading()
+      })
+  }
+
+  /**
+   * 给用户添加标签
+   */
+  addUserTag () {
+    const alreadyExist = this.context.curUser.tags.some((tag) => {
+      return tag.id === this.context.toAddTagId
+    })
+    if (alreadyExist) {
+      this.context.$message.error('该用户已有此标签')
+      return
+    }
+    this.$common.showLoading()
+    // 添加
+    api.tag.addTagToUser(this.context.curUser.id, this.context.toAddTagId)
+      .commonThen((success, data) => {
+        this.context.$message('添加成功')
+        this.context.addTagVisible = false
+        this.init()
+      }).finally(() => {
+        this.$common.hideLoading()
+      })
+  }
+
+  /**
+   * 删除用户的标签
+   */
+  deleteTagOfUser (userTagId) {
+    this.$common.showLoading()
+    // 添加
+    api.tag.deleteTagOfUser(userTagId)
+      .commonThen((success, data) => {
+        this.context.$message('删除成功')
+        this.init()
+        this.context.allTagVisible = false
+      }).finally(() => {
         this.$common.hideLoading()
       })
   }

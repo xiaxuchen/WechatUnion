@@ -71,23 +71,9 @@ export default {
     // 选择变化的时候将当前选中的传递出去
     handleSelectionChange (selection, row) {
       if (this.selectable) {
-        this.selectMap[`user${row.userId}`] = row
+        this.selectMap[`user${row.id}`] = row
         this.$emit('select', this.selectMap)
       }
-    }
-  },
-  watch: {
-    // 更新选中状态
-    userList (newValue) {
-      this.userData.userList.getRange().forEach(value => {
-        // if (!this.selectMap[`user${value.userId}`]) {
-        //   value.checked = false
-        // } else {
-        //   value.checked = true
-        // }
-        console.log(value.checked)
-        console.log('更新选中', this.selectMap[`user${value.userId}`])
-      })
     }
   },
   computed: {

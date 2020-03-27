@@ -11,7 +11,6 @@
             <div style="background-color: #f5f5f5;overflow: hidden" :style="{height:$store.state.system.availableHeight - 140 + 'px'}">
                 <wait-response v-show="curTab === 0" key="response"/>
                 <wait-access v-show="curTab === 1" key="access" />
-                <setting v-show="curTab === 2" key="setting"/>
             </div>
           </template>
         </Panel>
@@ -22,8 +21,7 @@
 import Panel from '@/components/Panel'
 import WaitResponse from './components/WaitResponse/index'
 import TabHeader from './components/TabHeader'
-import WaitAccess from './components/WaitAccess'
-import Setting from './components/Setting'
+import WaitAccess from './components/WaitAccess/index'
 import {ChatWebSocket} from '@/utils/ChatWebSocket'
 export default {
   provide () {
@@ -52,8 +50,7 @@ export default {
     Panel,
     WaitResponse,
     TabHeader,
-    WaitAccess,
-    Setting
+    WaitAccess
   },
   data () {
     return {

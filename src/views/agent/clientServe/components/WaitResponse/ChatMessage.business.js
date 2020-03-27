@@ -61,6 +61,7 @@ export default class ChatMessageBusiness extends BaseBusiness {
     let ids = messageList.map((msg) => {
       return msg.id
     })
+    console.log(ids && ids.length > 0)
     // 将加载下来的消息设置为已读
     if (ids && ids.length > 0) {
       this.messageRead(ids, userId)
@@ -125,7 +126,7 @@ export default class ChatMessageBusiness extends BaseBusiness {
         } else {
           this.context.loadingMessage = false
         }
-      }, this)).catch(() => {
+      }, this.context)).catch(() => {
         this.context.loadingMessage = false
       })
   }
@@ -150,7 +151,7 @@ export default class ChatMessageBusiness extends BaseBusiness {
         m.id = data.data
         // 发送成功后显示
         this.updateMessages([m], openId)
-      }, this)
+      }, this.context)
   }
 
   /**

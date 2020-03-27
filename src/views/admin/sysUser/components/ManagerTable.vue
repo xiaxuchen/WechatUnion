@@ -35,7 +35,7 @@
           width="180">
           <template slot-scope="scope">
             <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{ scope.row.createTime }}</span>
+            <span style="margin-left: 10px">{{ scope.row.createTime | formatTimeInMillis}}</span>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="230">

@@ -51,7 +51,7 @@
         width="240">
         <template slot-scope="{row}">
           <i class="el-icon-time"></i>
-          <span style="margin-left: 10px">{{ row.subscribeTime }}</span>
+          <span style="margin-left: 10px">{{ row.subscribeTime | formatTimeInMillis}}</span>
         </template>
       </el-table-column>
       </el-table>

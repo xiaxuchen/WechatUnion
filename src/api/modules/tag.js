@@ -17,9 +17,7 @@ export default {
    * @return {*}
    */
   deleteTag (tagId) {
-    return http.del('/tag', {
-      tagId
-    })
+    return http.del(`/tag/${tagId}`)
   },
   /**
    * 更新标签
@@ -38,5 +36,24 @@ export default {
    */
   getTagListWithCount () {
     return http.get('/tag/list')
+  },
+  /**
+   * 给用户添加标签
+   * @param id 用户id
+   * @param tagId 标签id
+   */
+  addTagToUser (id, tagId) {
+    return http.post('/tag/user', {
+      id,
+      tagId
+    })
+  },
+  /**
+   * 删除用户与标签的关系
+   * @param userTagId 标签关系id
+   * @return {*}
+   */
+  deleteTagOfUser (userTagId) {
+    return http.del(`/tag/user/${userTagId}`)
   }
 }

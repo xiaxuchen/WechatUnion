@@ -95,12 +95,12 @@ export default {
       // 监听消息的数量的变化，消息被设置为已读或者有新消息都会触发
       ws.subscribe(`/user/${managerId}/chatUser/message/count`, (body) => {
         // 更新用户消息的未读数
-        this.chatUserBusiness.updateNotRead(body.time, body.openId, body.count)
+        this.chatUserBusiness.updateNotRead(body.time, body.id, body.count)
       })
 
       // 监听新消息的到来
       ws.subscribe(`/user/${managerId}/chatUser/message`, (body) => {
-        this.chatMessageBusiness.addNewMessage()
+        this.chatMessageBusiness.addNewMessage(body.time, body.message, body.count)
       })
 
       // 监听接收用户成功

@@ -4,7 +4,9 @@
         :data="userList"
         class="user-table"
         v-loading="loading"
+        @select="onSelectChange"
       >
+        <el-table-column v-if="selectable" :selectable="true" />
         <el-table-column
           label="头像"
           width="120"
@@ -43,9 +45,10 @@
           width="240">
           <template slot-scope="{row}">
             <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{ row.subscribeTime }}</span>
+            <span style="margin-left: 10px">{{ row.subscribeTime | formatTimeInMillis }}</span>
           </template>
         </el-table-column>
+        <slot name="tail"></slot>
       </el-table>
     </div>
 </template>
@@ -68,8 +71,14 @@ export default {
       type: Boolean,
       default: false
     },
+    selectable: Boolean,
     userList: {
       type: Array
+    }
+  },
+  methods: {
+    onSelectChange (selection, row) {
+      this.$emit('select', selection, row)
     }
   }
 }

@@ -11,26 +11,36 @@
           <i class="el-icon-time" ></i> {{waitCount}}人待接入
         </div>
       </el-col>
-      <el-col :span="2" :push="15">
-        <agent-info :agent-info="agentInfo" @toggle-online="onToggleOnline"/>
-      </el-col>
-      <el-col :span="2" :push="15">
-        <div class="setting" @click="toggleTab(2)" :class="{active:curTab === 2}">
-          <q class="el-icon-s-tools" ></q>
-        </div>
-      </el-col>
+      <!--<el-col :span="2" :push="15">-->
+        <!--<div class="agentInfo" >-->
+          <!--<el-dropdown trigger="click" @command="onToggleOnline">-->
+            <!--<span class="title">-->
+              <!--{{agentInfo.name}} <q class="el-icon-arrow-down"></q>-->
+            <!--</span>-->
+            <!--<el-dropdown-menu slot="dropdown">-->
+              <!--<el-dropdown-item command="online">在线 <q class="el-icon-check" v-if="isOnline"/></el-dropdown-item>-->
+              <!--<el-dropdown-item command="leave">离开 <q class="el-icon-check" v-if="!isOnline"/></el-dropdown-item>-->
+            <!--</el-dropdown-menu>-->
+          <!--</el-dropdown>-->
+        <!--</div>-->
+      <!--</el-col>-->
+      <!--<el-col :span="2" :push="15">-->
+        <!--<div class="setting" @click="toggleTab(2)" :class="{active:curTab === 2}">-->
+          <!--<q class="el-icon-s-tools" ></q>-->
+        <!--</div>-->
+      <!--</el-col>-->
     </el-row>
   </div>
 </template>
 
 <script>
-import AgentInfo from './AgentInfo'
 import {mapState} from 'vuex'
 
 export default {
   data () {
     return {
       curTab: 0,
+      isOnline: false,
       agentInfo: {
         name: '夏旭晨',
         isOnline: true
@@ -43,15 +53,23 @@ export default {
       respondCount: state => state.message.respondCount})
   },
   components: {
-    AgentInfo
   },
   methods: {
     toggleTab (index) {
       this.curTab = index
       this.$emit('toggle-tab', index)
     },
-    onToggleOnline (isOnline) {
-      console.log('切换在线')
+    onToggleOnline (command) {
+      switch (command) {
+        case 'online': {
+          this.isOnline = true
+          break
+        }
+        case 'leave': {
+          this.isOnline = false
+        }
+      }
+      this.$emit('toggle-online', this.isOnline)
     }
   }
 }
@@ -73,6 +91,13 @@ export default {
       font-size: 20px;
       &.active {
         color: #67C23A;
+      }
+    }
+
+    .agentInfo {
+      cursor: pointer;
+      .title {
+        color: #ffffff;
       }
     }
   }

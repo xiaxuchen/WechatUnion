@@ -49,15 +49,14 @@ export default {
         if (success) {
           this.$store.commit('push/clear')
           this.$router.push({name: 'push'})
+          this.refresh = false
+          this.$nextTick(() => {
+            this.refresh = true
+          })
         }
         this.$message(data)
       })).finally(() => {
         loading.close()
-
-        this.refresh = false
-        this.$nextTick(() => {
-          this.refresh = true
-        })
       })
     }
   }

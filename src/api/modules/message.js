@@ -51,9 +51,16 @@ export default {
    * @returns {*}
    */
   receiveUsers (userList) {
-    console.log('接入会话')
     return http.request({
       url: '/message/session',
+      method: 'post',
+      data: userList,
+      isJson: true
+    })
+  },
+  receiveReceivableUser (userList) {
+    return http.request({
+      url: '/message/session/receivable',
       method: 'post',
       data: userList,
       isJson: true
@@ -112,6 +119,17 @@ export default {
     return http.get('/message/history/list', {
       userId,
       lastId
+    })
+  },
+  /**
+   * 更新经理的设置
+   */
+  configAgent (agentConfig) {
+    return http.request({
+      url: '/message/agent',
+      method: 'put',
+      isJson: true,
+      data: agentConfig
     })
   }
 }

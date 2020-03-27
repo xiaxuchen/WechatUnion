@@ -6,16 +6,16 @@ export default class ChatUserBusiness extends BaseBusiness {
    * @param openId 用户id
    */
   disconnect (openId) {
-    this.api.message.disConnectUser(openId).commonThen((success) => {
+    this.context.api.message.disConnectUser(openId).commonThen((success) => {
       if (success) {
         // 删除该用户
         this.context.chatUserListMap.delete(openId)
         // 如果是当前用户，则将当前用户设置为空
         if (this.context.isCurUser(openId)) {
-          this.$store.commit('message/setCurChatUser', null)
+          this.context.$store.commit('message/setCurChatUser', null)
         }
       }
-    }, this)
+    }, this.context)
   }
   /**
    * 将用户信息添加到列表中
@@ -41,6 +41,7 @@ export default class ChatUserBusiness extends BaseBusiness {
    */
   updateNotRead (requestTime, openId, count) {
     let time = this.context.lastRequestTime['messageChange'] || 0
+    console.log(openId)
     if (requestTime > time) {
       // 如果不存在该用户就直接不管
       if (!this.context.chatUserListMap.exist(openId)) {
@@ -72,7 +73,7 @@ export default class ChatUserBusiness extends BaseBusiness {
      */
     if (this.context.receivedMessage.exist(user.id)) {
       // 将消息加入到列表中去，同时将这些消息设为已读
-      this.updateMessages(this.context.receivedMessage.get(user.id), user.id, false, false)
+      this.context.chatMessageBusiness.updateMessages(this.context.receivedMessage.get(user.id), user.id, false, false)
       // 从缓存列表中删除
       this.context.receivedMessage.delete(user.id)
     }
