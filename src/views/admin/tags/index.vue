@@ -57,7 +57,7 @@
           <upload :action="uploadData.action"
                   :model-action="uploadData.modelAction"
                   :data="{tagId:curTagId}"
-                  @upload-success="onUploadSuccess"
+                  :on-success="onUploadSuccess"
           />
         </template>
       </bottom-button-dialog>

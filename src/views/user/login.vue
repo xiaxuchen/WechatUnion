@@ -31,7 +31,7 @@
             </el-form>
           </el-row>
           <el-row>
-            <el-col align="right" class="forget-password"><a href="#">忘记密码?</a></el-col>
+            <el-col align="right" class="forget-password" v-if="false"><a href="#">忘记密码?</a></el-col>
           </el-row>
         </div>
       </div>

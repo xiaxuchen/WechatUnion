@@ -26,6 +26,9 @@ export default {
       refresh: true
     }
   },
+  beforeDestroy () {
+    this.$store.commit('push/clear')
+  },
   methods: {
     onSendPush (pushInfo) {
       let users = []
@@ -33,8 +36,8 @@ export default {
         users.push(this.$store.state.push.selectedUserMap[key].id)
       })
 
-      if (users.length === 0) {
-        this.$message.error('请选择用户')
+      if (users.length < 2) {
+        this.$message.error('请至少选择两个用户')
         return
       }
 
@@ -53,8 +56,10 @@ export default {
           this.$nextTick(() => {
             this.refresh = true
           })
+          this.$message('推送成功')
+        } else {
+          this.$message.error(data)
         }
-        this.$message(data)
       })).finally(() => {
         loading.close()
       })

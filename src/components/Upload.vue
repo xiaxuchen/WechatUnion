@@ -14,6 +14,7 @@
       :on-success="onSuccess"
       :data="data"
       :headers="headers?headers:defaultHeaders"
+      :on-progress="onProgress"
       multiple>
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -34,16 +35,13 @@ export default {
       required: true
     },
     modelAction: String,
-    data: Object
+    data: Object,
+    onSuccess: Function,
+    OnProgress: Function
   },
   computed: {
     defaultHeaders () {
       return {Authorization: this.$store.state.manager.token}
-    }
-  },
-  methods: {
-    onSuccess (resp) {
-      this.$emit('upload-success', resp)
     }
   }
 }

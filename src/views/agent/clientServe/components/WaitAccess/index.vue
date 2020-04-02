@@ -9,6 +9,7 @@
             <el-col :span="6" :push="6">
               <!--TODO 不知道这个v-model和value会不会冲突-->
               <el-select size="mini" style="margin-right: 20px" v-model="searcher[curTab].tagId">
+                <el-option :value="-1" label="全部用户"></el-option>
                 <el-option
                   v-for="item in tags"
                   :key="item.id"
@@ -29,7 +30,7 @@
         </div>
         <el-tabs v-model="curTab" >
           <el-tab-pane label="待接入" name="待接入">
-              <user-list :loading="waitLoading" :height="height" :user-data.sync="waitData" @select="onWaitSelectChange"/>
+            <user-list :loading="waitLoading" :user-data.sync="waitData" @select="onWaitSelectChange"/>
           </el-tab-pane>
           <el-tab-pane label="可回访" name="可回访">
             <user-list :loading="receivableLoading" :user-data.sync="receivableData" @select="onReceivableSelectChange"/>

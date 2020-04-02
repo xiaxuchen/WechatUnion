@@ -46,11 +46,18 @@ instance.interceptors.request.use(
 */
 instance.interceptors.response.use(
   response => {
+    // TODO 这里暂时这样设置 状态码为500也这样
+    if (response.status === 500) {
+      location.pathname = constant.loginPath
+      console.log('回登录页')
+      return Promise.reject(response.data.msg)
+    }
     let code = response.data.code
     switch (code) {
       // 当用户未登录的时候导航到登录页面
-      case 20001: {
+      case 20002: {
         location.pathname = constant.loginPath
+        console.log('回登录页')
         return Promise.reject(response.data.msg)
       }
     }

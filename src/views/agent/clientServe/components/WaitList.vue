@@ -1,5 +1,5 @@
 <template>
-    <div class="user-list" :style="{height:height - 220 + 'px'}">
+    <div class="user-list" :style="{height:$store.state.system.availableHeight - 220 + 'px'}">
       <el-table :show-header="false"
         :data="userList"
         v-loading="loading"

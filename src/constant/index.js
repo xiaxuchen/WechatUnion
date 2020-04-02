@@ -1,3 +1,3 @@
 export default {
-  loginPath: '/login'
+  loginPath: '/union/login'
 }

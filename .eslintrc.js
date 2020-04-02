@@ -21,7 +21,8 @@ module.exports = {
     ],
     // add your custom rules here
     rules: {
-      "no-throw-literal": 0
+      "no-throw-literal": 0,
+      "comma-dangle": ["error", "never"] //是否允许对象中出现结尾逗号
         // allow async-await
         // 'generator-star-spacing': 'off',
         // allow debugger during development

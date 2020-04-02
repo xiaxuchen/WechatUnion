@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <el-button class="fr" size="mini" @click="showUploadExcelDialog"><b class="el-icon-receiving"></b> excel导入</el-button>
+      <el-button class="fr" type="primary" size="mini" @click="showUploadExcelDialog"><b class="el-icon-receiving"></b> excel导入</el-button>
     </div>
     <el-table
       :data="userData.users"
@@ -74,16 +74,10 @@
       </template>
       <template>
         <div align="center">
-          <el-upload
-            drag
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            :action="excelUploadAction"
-            :on-success="addUsersToList"
-            :headers="headers"
-            multiple>
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          </el-upload>
+          <upload :action="excelUploadAction"
+                  :model-action="modelAction"
+                  :on-success="addUsersToList"
+          />
         </div>
       </template>
     </bottom-button-dialog>
@@ -93,6 +87,7 @@
 <script>
 import BottomButtonDialog from '@/components/BottomButtonDialog'
 import {mapState} from 'vuex'
+import Upload from '@/components/Upload'
 export default {
   mounted () {
     this.userData.total = this.selectedSize
@@ -107,6 +102,7 @@ export default {
       },
       uploadDialogVisible: false,
       excelUploadAction: this.api.baseURL + '/push/users/excel',
+      modelAction: this.api.baseURL + '/resource/template/phone',
       headers: {Authorization: this.$store.state.manager.token},
       loading: false
     }
@@ -185,6 +181,7 @@ export default {
     }
   },
   components: {
+    Upload,
     BottomButtonDialog
   }
 }

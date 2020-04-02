@@ -14,14 +14,15 @@
             </template>
           </el-popover>
         </el-col>
-        <el-col :span="2" align="center">
-          <q class="el-icon-folder icon-button"></q>
-        </el-col>
-        <el-col :span="3" :push="17" align="center">
-          <div class="quick-response">
-            快捷回复 <q class="el-icon-arrow-right"></q>
-          </div>
-        </el-col>
+        <!--TODO 先注释，后期加上-->
+        <!--<el-col :span="2" align="center">-->
+          <!--<q class="el-icon-folder icon-button"></q>-->
+        <!--</el-col>-->
+        <!--<el-col :span="3" :push="17" align="center">-->
+          <!--<div class="quick-response">-->
+            <!--快捷回复 <q class="el-icon-arrow-right"></q>-->
+          <!--</div>-->
+        <!--</el-col>-->
       </el-row>
       <el-row style="margin-top: 10px">
         <el-col>
@@ -30,7 +31,7 @@
       </el-row>
       <el-row style="margin-top: 10px">
         <el-col align="right" class="text-info">
-          按Enter发送，Ctrl+Enter换行
+          按Enter发送
         </el-col>
       </el-row>
     </div>

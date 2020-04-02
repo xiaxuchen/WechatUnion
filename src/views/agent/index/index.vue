@@ -1,7 +1,7 @@
 <template>
     <div class="index">
       <about-info style="margin-top: 20px" :about-info="aboutInfo"/>
-      <div style="padding: 20px 100px 0px 100px">
+      <div style="padding: 20px 100px 0 100px">
         <ve-line :data="chartData"></ve-line>
       </div>
     </div>
@@ -23,9 +23,9 @@ export default {
           rows: data.chartData.map((item) => {
             return {
               '日期': item.date,
-              '接受用户': item.receiveUserCount,
-              '回复用户': item.responseUserCount,
-              '回复率': item.percent
+              '推送用户': item.receiveUserCount,
+              '接受用户': item.responseUserCount,
+              '送达率': item.percent
             }
           })
         })
@@ -37,7 +37,7 @@ export default {
     return {
       aboutInfo: {},
       chartData: {
-        columns: ['日期', '接受用户', '回复用户', '回复率'],
+        columns: ['日期', '推送用户', '接受用户', '接受率'],
         rows: []
       }
     }

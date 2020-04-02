@@ -5,7 +5,7 @@
                 <router-link :to="item.path" class="tags-li-title">
                     {{item.title}}
                 </router-link>
-                <span v-show="item.title!='系统首页'" class="tags-li-icon" @click="closeTags(index)"><i class="el-icon-close"></i></span>
+                <span v-show="item.title!='系统首页'" class="tags-li-icon" @click="closeTags(index)"><i class="el-icon-close text-info"></i></span>
             </li>
         </ul>
         <div class="tags-close-box">
@@ -19,7 +19,6 @@
                 </el-dropdown-menu>
             </el-dropdown>
         </div>
-
     </div>
 </template>
 
@@ -39,9 +38,16 @@ export default {
       const delItem = this.tagsList.splice(index, 1)[0]
       const item = this.tagsList[index] ? this.tagsList[index] : this.tagsList[index - 1]
       if (item) {
+        // 如果是缓存的就刷新缓存
+        if (this.$route.meta.keep) {
+          this.$route.meta.keep = false
+          this.$nextTick(() => {
+            this.$route.meta.keep = true
+          })
+        }
         delItem.path === this.$route.fullPath && this.$router.push(item.path)
       } else {
-        this.$router.push('/')
+        this.$router.push('/index')
       }
     },
     // 关闭全部标签

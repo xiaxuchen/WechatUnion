@@ -12,8 +12,8 @@
       @open="handleOpen"
       @close="handleClose"
       :collapse-transition="false"
-      :router="true"
       :collapse="isCollapse"
+      @select="onSelect"
       active-text-color="#ffd04b">
         <div :is="nav.subMenus? 'el-submenu': 'el-menu-item'" :index="nav.path" v-for="nav in navList" :key="nav.title">
           <template slot="title" v-if="nav.subMenus">
@@ -34,7 +34,7 @@ export default {
   name: 'AsideNav',
   data () {
     return {
-      activeIndex: window.location.pathname,
+      activeIndex: '',
       isCollapse: false,
       direction: 'fa-angle-double-left',
       widthPre: this.width
@@ -60,8 +60,11 @@ export default {
     event: 'collapse'
   },
   watch: {
-    $route (to, from) {
-      this.activeIndex = to.meta.index
+    '$route': {
+      handler (to, from) {
+        this.activeIndex = to.meta.index
+      },
+      immediate: true
     }
   },
   methods: {
@@ -70,6 +73,9 @@ export default {
     },
     handleClose (key, keyPath) {
       console.log(key, keyPath)
+    },
+    onSelect (index) {
+      this.$router.push(index)
     },
     toggleCollapse () {
       let width

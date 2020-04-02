@@ -21,18 +21,12 @@
         </template>
         <template>
           <div align="center">
-            <el-upload
-              drag
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-              :action="excelUploadAction"
-              :on-success="uploadRelation"
-              :on-progress="clearLast"
-              :headers="headers"
-              :data="params"
-              multiple>
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-            </el-upload>
+            <upload :action="excelUploadAction"
+                    :model-action="modelAction"
+                    :on-success="uploadRelation"
+                    :on-progress="clearLast"
+                    :data="params"
+            />
           </div>
         </template>
       </bottom-button-dialog>
@@ -42,6 +36,7 @@
 <script>
 import BottomButtonDialog from '@/components/BottomButtonDialog'
 import UserList from './components/UserList'
+import Upload from '@/components/Upload'
 export default {
   props: {
     id: {
@@ -50,6 +45,7 @@ export default {
     }
   },
   components: {
+    Upload,
     BottomButtonDialog,
     UserList
   },
@@ -57,7 +53,7 @@ export default {
     return {
       uploadDialogVisible: false,
       excelUploadAction: this.api.baseURL + '/sysuser/belong',
-      headers: {Authorization: this.$store.state.manager.token},
+      modelAction: this.api.baseURL + '/resource/template/phone',
       excludes: [],
       // 导入的模式
       mode: 0,

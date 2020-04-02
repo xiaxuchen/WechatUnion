@@ -1,16 +1,6 @@
-const selectedUserMap = window.storage.getItem('push/selectedUserMap')
-let selectedSize = 0
-if (selectedUserMap) {
-  Object.keys(selectedUserMap).forEach(key => {
-    if (selectedUserMap[key] != null) {
-      selectedSize++
-    }
-  })
-}
-
 const state = {
-  selectedUserMap: selectedUserMap || {},
-  selectedSize: selectedSize || 0
+  selectedUserMap: {},
+  selectedSize: 0
 }
 
 /**

@@ -7,6 +7,7 @@ Vue.use(Router)
 
 export default new Router({
   loginPath: 'login',
+  base: '/union/',
   mode: 'history',
   routes: [
     ...routes,
@@ -30,7 +31,8 @@ export default new Router({
           component: () => import('@/views/agent/push'),
           meta: {
             title: '用户推送',
-            index: '/push'
+            index: '/push',
+            keep: true
           }
         },
         {
@@ -39,7 +41,8 @@ export default new Router({
           component: () => import('@/views/agent/clientServe'),
           meta: {
             title: '用户接入',
-            index: '/clientServe'
+            index: '/clientServe',
+            keep: true
           }
         },
         {
@@ -48,7 +51,8 @@ export default new Router({
           component: () => import('@/views/admin/sysUser'),
           meta: {
             title: '管理员管理',
-            index: '/sysUser'
+            index: '/sysUser',
+            keep: true
           }
         },
         {
@@ -57,7 +61,8 @@ export default new Router({
           component: () => import('@/views/admin/tags'),
           meta: {
             title: '用户管理',
-            index: '/tags'
+            index: '/tags',
+            keep: true
           }
         },
         {
@@ -66,7 +71,8 @@ export default new Router({
           component: () => import('@/views/user/mine'),
           meta: {
             title: '我的资料',
-            index: '/mine'
+            index: '/mine',
+            keep: true
           }
         },
         {
@@ -75,7 +81,8 @@ export default new Router({
           component: () => import('@/views/admin/relation'),
           meta: {
             title: '关系管理',
-            index: '/relation'
+            index: '/relation',
+            keep: true
           },
           props: true
         }

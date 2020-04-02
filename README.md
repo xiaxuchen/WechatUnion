@@ -1,30 +1,114 @@
 # wechat-union
 
-> 微信公众号页面
+## 一、 技术栈
+1. 使用vue框架以及vue的单页面架构
+2. 使用vue-cli创建项目，使用webpack构建项目
+3. 使用vue-router管理项目路由
+4. 使用vuex实现多组件间的通信和数据共享
+5. 使用cookie和localStorage实现重要数据的持久化，如token
+6. 使用element-ui作为ui框架构建项目
+7. 使用less，也可以使用css
 
-## Build Setup
+## 二、 目录结构
+- build 项目的webpack的配置文件，不了解的情况下不要做更改
+- config vue-cli相关的配置，同样不了解的情况下不要更改
+- dist 使用npm run build生成产物的位置
+- node_modules 项目的依赖目录，各种框架的文件
+- src 项目源文件
+  - api 网络请求接口统一放置位置
+  - assets 静态资源放置位置，如图片、样式
+  - common 项目共用的代码可放置在此，如基类(业务的基类)
+  - components 通用组件，项目中多个地方需要使用到的代码或者各个项目通用的代码可以封装为一个组件
+  - constant 项目中的常量放置在这里面
+  - filter vue的filter，可以对数据进行格式转换
+  - router 路由的配置，其中routes.js未登录就可访问的页面，router.js中写了所有界面的路由，index.js配置总的并引入其他两个文件的配置
+  - store vuex代码放置的文件夹
+  - utils 工具
+  - views 界面放置的位置
+  - App.vue 相当于html的body的代码
+  - Frame.vue 项目大部分界面通用的模板，有头部、侧边栏
+  - main.js 项目的入口，相当于程序的main方法，代码的通用配置一般在这里配
+## 三、 项目代码解释
+#### 0. 基本知识
+- 当文件夹里有一个index.js时，如果需要引用该index.js，路径只要写到文件夹即可
+- 一般使用多文件来拆分各个模块，最终在index.js中合并，可以参考router文件夹下的代码
+
+
+#### 1. api/http.js
+
+由于项目使用restful风格，需要get、post、put、delete方法，又希望能简便开发，
+便自己封装了方法。
+
+使用方法:
+- 当只需要传递请求参数的时候，可以直接调用http中的相应方法。
+- 但是如果需要传递请求头、请求体等数据，则需要直接使用request
+方法，使用方式可以参照官方的配置，使用的就是axios的request方法，
+但是做了一些增强，添加isJson: true配置即可告知服务器是json数据，
+具体参考api/modules下的代码
+
+配置请求的基础url
+
+由于请求的主机、端口、项目名一般都是相同的，所以我们可以配置基础url，
+使得我们无需在每个接口写整个url，可以省略基础url部分，具体配置在api/apiconst.js
+
+拦截器
+
+由于项目的后端使用token机制，使得我们在每个请求的请求头中都要
+携带token参数，故在api/config.js中我们使用axios的请求拦截器统一
+进行了传递，使得每个请求都无需关心这一点,同时在响应拦截器我们对返回
+的状态码做了统一处理，当返回指定code或状态码时请求登录信息返回登录页
+
+#### 2. 公共样式
+由于vue的设定，如果在页面的style标签上中添加scoped属性，则标签下的样式
+只能在当前页面生效(原理是通过一个属性选择器)，vue也建议这样做，但是如果需要
+修改其他组件的内部样式则无法通过scoped样式完成，可以将其写在assets/stylesheet/common.less中
+同时也可以在里面定义公共样式，方便界面的编写
+
+#### 3. 组件
+封装组件的条件，当你的一些界面元素需要在多个页面共用或者在多个项目中通用的，你可以对代码抽取，
+将其封装成组件，这样既方便维护，也减少代码冗余，公用组件请放在components文件夹中
+
+#### 4. 路由
+路由现在只是基本实现功能，后期需要采用动态路由，也就是用户的路由、菜单等都是从服务器的信息中
+筛选而来的，比如该用户是超级管理员，他会有哪些页面、哪些菜单，这些都不是一开始就加载的，具体百度
+
+#### 5. 权限
+当前项目没有做很多的权限管理，在router文件夹的index.js中使用路由守卫在跳转页面之前进行网络请求
+判断是否可以跳转该页面，后期可以对其进行讨论如何实现，目前是一个空实现，也就是无论如何都返回可以
+#### 6. store
+一般组件间的通信不会使用vuex，只有多个组件通信或者系统中常用的数据需要使用到，比如token的访问
+
+#### 7. utils
+在这个文件夹中写了一些工具类，比如表情的转化，通用的数据结构，通用的数据存储(持久化，store.js),以及聊天的websocket通信
+
+#### 8. 界面文件的结构规范
+文件名或者文件夹的名字使用驼峰命名法，首字母小写，当一个文件能完成时无需创建文件夹，
+当页面逻辑复杂且庞大了，可以考虑创建同名文件夹，在components文件中拆分组件，
+在business文件夹中拆分逻辑
+
+#### 9. 项目代码的配置(main.js)
+1. 为vue实例添加了api属性，直接可以调用api模块的方法，而不需要import api，
+2. 引入了store.js，使得window实例有了store属性，可以调用getItem、setItem等方法持久化数据
+3. 为vue实例添加$bus属性，事件总线，跨组件通信可以使用他，具体可以百度
+4. 为vue实例添加__属性使用lodash工具框架，添加$util、$const方便引用工具方法和常量
+5. 注册vue的filter，使得项目可以直接使用filter文件夹下index.js的过滤器
+6. 加载element-ui,加载common模块，在common模块中有显示、隐藏加载中方法
+
+#### 10. 聊天部分代码
+项目中的聊天部分在views/agent/clientServe中，通过在index.js连接websocket，
+然后通过$bus发出连接成功事件，在聊天界面中的聊天模块、微信用户模块就能够进行监听，
+并通过websocket与服务器通信
+
+## 四、 项目使用
 
 ``` bash
-# install dependencies
+# 安装框架代码
 npm install
 
-# serve with hot reload at localhost:8080
+# 启动项目，用于调试
 npm run dev
 
-# build for production with minification
+# 打包项目，打包后将会生成在dist文件夹下
 npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

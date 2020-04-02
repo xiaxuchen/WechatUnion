@@ -10,11 +10,10 @@
           <v-tags />
         </el-card>
         <el-scrollbar class="hidden-horizontal" :style="{height:scrollHeight + 'px'}">
-          <transition name="move" mode="out-in">
-            <keep-alive>
-              <router-view :height="scrollHeight"/>
-            </keep-alive>
-          </transition>
+          <keep-alive>
+             <router-view v-if="$route.meta.keep" :height="scrollHeight"></router-view>
+          </keep-alive>
+          <router-view v-if="!$route.meta.keep" :height="scrollHeight"></router-view>
         </el-scrollbar>
       </div>
     </el-row>
